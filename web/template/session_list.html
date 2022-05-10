@@ -1,0 +1,45 @@
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+	<title>Record | rrweb</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+</head>
+
+<body>
+	<div class="container mt-3">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active" aria-current="page">Sessions</li>
+			</ol>
+		</nav>
+		<h2 class="mb-3">Record</h2>
+		<div class="alert alert-warning" role="alert">
+			Server record and replay the web
+		</div>
+		<ul class="list-group mb-5">
+			{{ range .Sessions }}
+			<a href="/session/{{ .SessionID }}" class="list-group-item list-group-item-action">
+				<div class="d-flex w-100 justify-content-between">
+					<h5 class="mb-2 mt-1"><span class="badge bg-secondary">{{ .SessionName }}</span></h5>
+					<small class="text-muted">{{ .UpdatedAt }}</small>
+				</div>
+			</a>
+			{{ end }}
+		</ul>
+		<h2 class="mb-3">Start using</h2>
+		<p>Insert the following snippet at the bottom of your <code>&lt;head&gt;</code> tag:</p>
+		<pre>
+&lt;script type=&quot;application/javascript&quot; src=&quot;{{ .URL }}/record.js&quot; &gt;&lt;/script&gt;
+&lt;script type=&quot;application/javascript&quot;&gt;
+window.recorder
+  .setSession({ session_name: 'name' })
+&lt;/script&gt;
+			</pre>
+	</div>
+</body>
+
+</html>

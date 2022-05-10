@@ -1,0 +1,139 @@
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+	<title>Replay | rrweb</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous" />
+	<link href="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/style.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div class="main container mt-3">
+		<div class="row">
+			<div class="col">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="/">Sessions</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Replay</li>
+					</ol>
+				</nav>
+				<h2 class="mb-3">Replay</h2>
+				<div class="alert alert-warning" role="alert">
+					Server record and replay the web
+				</div>
+			</div>
+			<div class="row mb-3">
+				<div class="col">
+					<span class="badge bg-success">{{ .Session.OS }}</span>
+					<span class="badge bg-primary">{{ .Session.Browser }} {{ .Session.Version }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container mb-3" id="player">
+	</div>
+	<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js"></script>
+	<script type="application/javascript">
+
+		let replayer = null
+		let isPlay = false
+
+		let steamData = ""
+		let keyBreak = '"--break--"'
+
+		const doDone = () => {
+			let newEvents = []
+			let split = steamData.split(keyBreak);
+			if (split && split.length) {
+				split.forEach(item => {
+					item = item.trim()
+					if (item) {
+						newEvents = newEvents.concat(JSON.parse(item))
+					}
+				})
+			}
+			console.log("newEvents ", newEvents)
+			doReplay(newEvents)
+		}
+
+		const doChunk = (data) => {
+			steamData += data
+			if (steamData.indexOf(keyBreak) !== -1) {
+				let split = steamData.split(keyBreak);
+				let events = JSON.parse(split[0])
+				console.log("events", events)
+				doReplay(events)
+				split.shift();
+				steamData = split.join(keyBreak)
+			}
+		}
+
+		const doReplay = (events) => {
+			if (replayer === null && events.length >= 2) {
+				replayer = new rrwebPlayer({
+					target: document.getElementById("player"),
+					props: {
+						width: document.getElementById("player").offsetWidth,
+						events: events,
+					},
+				});
+			} else {
+				if (events !== null) {
+					for (event of events) {
+						replayer.addEvent(event)
+					}
+				}
+			}
+			if (!isPlay) {
+				replayer.play()
+				isPlay = true
+			}
+		}
+
+
+		fetch('/session/event/{{ .SessionID }}')
+			.then(response => response.body)
+			.then(rb => {
+				const reader = rb.getReader();
+
+				return new ReadableStream({
+					start(controller) {
+						// The following function handles each data chunk
+						function push() {
+							// "done" is a Boolean and value a "Uint8Array"
+							reader.read().then(({ done, value }) => {
+								// If there is no more data to read
+								if (done) {
+									console.log('done', done);
+									doDone()
+									controller.close();
+									return;
+								}
+
+								// Get the data and send it to the browser via the controller
+								controller.enqueue(value)
+
+								// Handle rrweb
+								let enc = new TextDecoder("utf-8");
+								let arr = new Uint8Array(value);
+								let result = enc.decode(arr)
+								doChunk(result);
+
+								return push();
+							})
+						}
+						push();
+					}
+				});
+			})
+			.then(stream => {
+				// Respond with our stream
+				return new Response(stream, { headers: { "Content-Type": "text/html" } }).text();
+			})
+	</script>
+</body>
+
+</html>
