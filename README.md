@@ -28,35 +28,39 @@ go run cmd/analytics/main.go
 ```
 .
 ├── cmd
-│   └── analytics
-│       └── main.go
+│   └── analytics
+│       └── main.go
 ├── configs
-│   └── configs.go
+│   └── configs.go
 ├── db
-│   └── conn.go
+│   └── conn.go
 ├── go.mod
 ├── go.sum
 ├── internal
-│   ├── app
-│   │   └── session
-│   │       ├── delivery.go
-│   │       ├── delivery_http.go
-│   │       ├── repository.go
-│   │       └── usecase.go
-│   └── pkg
-│       ├── common
-│       │   └── common.go
-│       └── middleware
-│           └── cors.go
+│   ├── app
+│   │   └── session
+│   │       ├── delivery.go
+│   │       ├── delivery_http.go
+│   │       ├── repository.go
+│   │       └── usecase.go
+│   └── pkg
+│       ├── common
+│       │   └── common.go
+│       ├── log
+│       │   ├── error.go
+│       │   ├── panic.go
+│       │   └── sentry.go
+│       └── middleware
+│           └── cors.go
 ├── models
-│   ├── client.go
-│   ├── event.go
-│   ├── session.go
-│   └── website.go
+│   ├── client.go
+│   ├── event.go
+│   ├── session.go
+│   └── website.go
 ├── README.md
 └── web
     ├── static
-    │   └── record.js
+    │   └── record.js
     └── template
         ├── session_by_id.html
         └── session_list.html
