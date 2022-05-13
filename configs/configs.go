@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/getsentry/sentry-go"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -22,13 +22,10 @@ var (
 	}
 
 	Database struct {
-		Client         influxdb2.Client
-		URL            string
-		Token          string
-		Bucket         string
-		Measurement    string
-		Organization   string
-		RequestTimeout uint
+		Client     *mongo.Database
+		URI        string
+		Name       string
+		Collection string
 	}
 )
 
@@ -42,12 +39,9 @@ func init() {
 	ServerPort = os.Getenv("SERVER_PORT")
 	QueryLimit = os.Getenv("QUERY_LIMIT")
 
-	Database.URL = os.Getenv("INFLUX_URL")
-	Database.Token = os.Getenv("INFLUX_TOKEN")
-	Database.Bucket = os.Getenv("INFLUX_BUCKET")
-	Database.Measurement = os.Getenv("INFLUX_MEASUREMENT")
-	Database.Organization = os.Getenv("INFLUX_ORGANIZATION")
-	Database.RequestTimeout = 60
+	Database.URI = os.Getenv("URI")
+	Database.Name = os.Getenv("NAME")
+	Database.Collection = os.Getenv("COLLECTION")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")
 	sampleRate, err := strconv.ParseFloat(os.Getenv("SENTRY_TRACE_SAMPLE_RATE"), 32)
