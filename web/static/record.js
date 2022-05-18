@@ -29,10 +29,9 @@ window.recorder = {
 			window.sessionStorage.removeItem('rrweb')
 		}
 	},
-	setSession: function ({ session_name }) {
+	setSession: function () {
 		const session = window.recorder.session.get();
 		session.session_id = window.recorder.session.genId(64);
-		session.session_name = session_name;
 		window.recorder.session.save(session)
 		return window.recorder;
 	},

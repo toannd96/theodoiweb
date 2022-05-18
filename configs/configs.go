@@ -22,10 +22,13 @@ var (
 	}
 
 	Database struct {
-		Client     *mongo.Database
-		URI        string
-		Name       string
-		Collection string
+		Client            *mongo.Database
+		URI               string
+		Name              string
+		UserCollection    string
+		WebsiteCollection string
+		SessionCollection string
+		EventCollection   string
 	}
 )
 
@@ -41,7 +44,10 @@ func init() {
 
 	Database.URI = os.Getenv("URI")
 	Database.Name = os.Getenv("NAME")
-	Database.Collection = os.Getenv("COLLECTION")
+	Database.UserCollection = os.Getenv("USER_COLLECTION")
+	Database.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
+	Database.SessionCollection = os.Getenv("SESSION_COLLECTION")
+	Database.EventCollection = os.Getenv("EVENT_COLLECTION")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")
 	sampleRate, err := strconv.ParseFloat(os.Getenv("SENTRY_TRACE_SAMPLE_RATE"), 32)

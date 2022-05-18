@@ -75,7 +75,6 @@ func initializeRoutes(r *gin.Engine) {
 			"message": "OK",
 		})
 	})
-
 	delivery := session.NewHTTPDelivery()
 	delivery.InitRoutes(r)
 }

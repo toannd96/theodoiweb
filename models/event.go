@@ -1,14 +1,16 @@
 package models
 
+import "gopkg.in/mgo.v2/bson"
+
 // Events ...
 type Events struct {
-	Events []Event `json:"events,omitempty"`
+	SessionID string  `json:"session_id"`
+	Events    []Event `json:"events"`
 }
 
 // Event ...
 type Event struct {
-	SessionID string      `json:"session_id"`
-	Type      int64       `json:"type"`
-	Data      interface{} `json:"data"`
-	Timestamp int64       `json:"timestamp"`
+	Type      int64  `json:"type"`
+	Data      bson.M `json:"data"`
+	Timestamp int64  `json:"timestamp"`
 }

@@ -4,7 +4,7 @@ import "time"
 
 // Website ...
 type Website struct {
-	ID         string    `json:"website_id"`
+	ID         string    `json:"id"`
 	UserID     string    `json:"user_id"`
 	Name       string    `json:"name"`
 	URL        string    `json:"url"`
