@@ -3,7 +3,6 @@
 ### Install dependencies
 
 - GoLang: version 1.17
-- InfluxDB: version 2
 
 ## Project structure
 
@@ -27,40 +26,39 @@ go run cmd/analytics/main.go
 
 ```
 .
-├── cmd
-│   └── analytics
-│       └── main.go
 ├── configs
-│   └── configs.go
+│   └── configs.go
 ├── db
-│   └── conn.go
+│   └── conn.go
 ├── go.mod
 ├── go.sum
 ├── internal
-│   ├── app
-│   │   └── session
-│   │       ├── delivery.go
-│   │       ├── delivery_http.go
-│   │       ├── repository.go
-│   │       └── usecase.go
-│   └── pkg
-│       ├── common
-│       │   └── common.go
-│       ├── log
-│       │   ├── error.go
-│       │   ├── panic.go
-│       │   └── sentry.go
-│       └── middleware
-│           └── cors.go
+│   ├── app
+│   │   ├── event
+│   │   │   ├── repository.go
+│   │   │   └── usecase.go
+│   │   └── session
+│   │       ├── delivery.go
+│   │       ├── delivery_http.go
+│   │       ├── repository.go
+│   │       └── usecase.go
+│   └── pkg
+│       ├── log
+│       │   ├── error.go
+│       │   ├── panic.go
+│       │   └── sentry.go
+│       └── middleware
+│           └── cors.go
+├── main.go
 ├── models
-│   ├── client.go
-│   ├── event.go
-│   ├── session.go
-│   └── website.go
+│   ├── event.go
+│   ├── session.go
+│   ├── user.go
+│   └── website.go
 ├── README.md
 └── web
     ├── static
-    │   └── record.js
+    │   └── record.js
     └── template
         ├── session_by_id.html
         └── session_list.html

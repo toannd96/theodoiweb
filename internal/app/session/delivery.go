@@ -1,6 +1,8 @@
 package session
 
 import (
+	"analytics-api/internal/app/event"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,8 +12,7 @@ type HTTPDelivery interface {
 	InitRoutes(r *gin.Engine)
 
 	// Other functions to handle HTTP requests
-	GetAllSessionByID(c *gin.Context)
-	GetAllEventLimitByID(c *gin.Context)
+	GetEventBySessionID(c *gin.Context)
 	RenderSessionPlay(c *gin.Context)
 	RenderListSession(c *gin.Context)
 	SaveSession(c *gin.Context)
@@ -21,5 +22,6 @@ type HTTPDelivery interface {
 func NewHTTPDelivery() HTTPDelivery {
 	return &httpDelivery{
 		sessionUseCase: NewUseCase(),
+		eventUseCase:   event.NewUseCase(),
 	}
 }

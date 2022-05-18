@@ -49,19 +49,9 @@ func main() {
 
 	var err error
 
-	client := db.NewClient()
-	if client != nil {
-		defer client.Close()
-	}
+	db.NewClient()
 
 	r := gin.Default()
-
-	// Disable proxies for now. Set it to proxy IPs to get client IP if needed
-	// More info: https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies
-	err = r.SetTrustedProxies(nil)
-	if err != nil {
-		logrus.Fatalln(err)
-	}
 
 	// Custom recovery to enable Sentry capturing
 	r.Use(gin.CustomRecovery(func(c *gin.Context, err interface{}) {
@@ -85,7 +75,6 @@ func initializeRoutes(r *gin.Engine) {
 			"message": "OK",
 		})
 	})
-
 	delivery := session.NewHTTPDelivery()
 	delivery.InitRoutes(r)
 }

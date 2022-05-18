@@ -2,17 +2,23 @@ package db
 
 import (
 	"analytics-api/configs"
+	"context"
+	"os"
 
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"analytics-api/internal/pkg/log"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// NewClient open new client to influxdb
-func NewClient() influxdb2.Client {
-	configs.Database.Client = influxdb2.NewClientWithOptions(
-		configs.Database.URL,
-		configs.Database.Token,
-		influxdb2.DefaultOptions().SetHTTPRequestTimeout(
-			configs.Database.RequestTimeout,
-		))
-	return configs.Database.Client
+// NewClient open new client to mongodb
+func NewClient() {
+	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().ApplyURI(os.Getenv("URI")).SetServerAPIOptions(serverAPIOptions)
+
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		log.LogError(context.TODO(), err)
+	}
+	configs.Database.Client = client.Database(os.Getenv("NAME"))
 }
