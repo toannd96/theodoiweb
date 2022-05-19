@@ -28,7 +28,6 @@ var (
 		UserCollection    string
 		WebsiteCollection string
 		SessionCollection string
-		EventCollection   string
 	}
 )
 
@@ -47,7 +46,6 @@ func init() {
 	Database.UserCollection = os.Getenv("USER_COLLECTION")
 	Database.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
 	Database.SessionCollection = os.Getenv("SESSION_COLLECTION")
-	Database.EventCollection = os.Getenv("EVENT_COLLECTION")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")
 	sampleRate, err := strconv.ParseFloat(os.Getenv("SENTRY_TRACE_SAMPLE_RATE"), 32)

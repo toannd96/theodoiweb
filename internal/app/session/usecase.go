@@ -7,9 +7,13 @@ import (
 // UseCase ...
 type UseCase interface {
 	GetAllSession(sessions models.Sessions) (models.Sessions, error)
-	GetSessionByID(sessionID string, session *models.Session) error
+	GetSession(id string, session *models.Session) error
 	InsertSession(session models.Session) error
-	FindSessionID(id string) (int64, error)
+	FindSession(id string) (int64, error)
+
+	GetCountEvent(id string, session *models.Session) (int, error)
+	GetEvent(id string, session *models.Session, limit, skip int) error
+	UpdateEvent(session models.Session) error
 }
 
 type useCase struct {
@@ -23,9 +27,9 @@ func NewUseCase() UseCase {
 	}
 }
 
-// GetSessionByID get session by session id
-func (instance *useCase) GetSessionByID(sessionID string, session *models.Session) error {
-	err := instance.repo.GetSessionByID(sessionID, session)
+// GetSession get session by session id
+func (instance *useCase) GetSession(id string, session *models.Session) error {
+	err := instance.repo.GetSession(id, session)
 	if err != nil {
 		return err
 	}
@@ -43,18 +47,45 @@ func (instance *useCase) GetAllSession(sessions models.Sessions) (models.Session
 
 // InsertSession insert session
 func (instance *useCase) InsertSession(session models.Session) error {
-	err := instance.repo.Insert(session)
+	err := instance.repo.InsertSession(session)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// FindSessionID find session id to check exists
-func (instance *useCase) FindSessionID(id string) (int64, error) {
-	count, err := instance.repo.FindSessionID(id)
+// FindSession find session id to check exists
+func (instance *useCase) FindSession(id string) (int64, error) {
+	count, err := instance.repo.FindSession(id)
 	if err != nil {
 		return 0, err
 	}
 	return count, nil
+}
+
+// GetCountEvent get count event of session by session id
+func (instance *useCase) GetCountEvent(id string, session *models.Session) (int, error) {
+	count, err := instance.repo.GetCountEvent(id, session)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// GetEvent get limit event of session by session id
+func (instance *useCase) GetEvent(id string, session *models.Session, limit, skip int) error {
+	err := instance.repo.GetEvent(id, session, limit, skip)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateEvent update event of session by session id
+func (instance *useCase) UpdateEvent(session models.Session) error {
+	err := instance.repo.UpdateEvent(session)
+	if err != nil {
+		return err
+	}
+	return nil
 }
