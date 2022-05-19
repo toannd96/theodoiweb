@@ -34,9 +34,6 @@ go run cmd/analytics/main.go
 ├── go.sum
 ├── internal
 │   ├── app
-│   │   ├── event
-│   │   │   ├── repository.go
-│   │   │   └── usecase.go
 │   │   └── session
 │   │       ├── delivery.go
 │   │       ├── delivery_http.go
@@ -51,7 +48,6 @@ go run cmd/analytics/main.go
 │           └── cors.go
 ├── main.go
 ├── models
-│   ├── event.go
 │   ├── session.go
 │   ├── user.go
 │   └── website.go
