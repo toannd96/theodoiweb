@@ -1,8 +1,6 @@
 package session
 
 import (
-	"analytics-api/internal/app/event"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +20,5 @@ type HTTPDelivery interface {
 func NewHTTPDelivery() HTTPDelivery {
 	return &httpDelivery{
 		sessionUseCase: NewUseCase(),
-		eventUseCase:   event.NewUseCase(),
 	}
 }
