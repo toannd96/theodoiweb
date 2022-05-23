@@ -10,10 +10,13 @@ type UseCase interface {
 	GetSession(id string, session *models.Session) error
 	InsertSession(session models.Session) error
 	FindSession(id string) (int64, error)
+	UpdateSession(id string, session models.Session) error
 
-	GetCountEvent(id string, session *models.Session) (int, error)
-	GetEvent(id string, session *models.Session, limit, skip int) error
-	UpdateEvent(session models.Session) error
+	GetEvents(id string, session *models.Session) (models.Events, error)
+	GetEventByLimitSkip(id string, session *models.Session, limit, skip int) error
+
+	GetSessionTimestamp(id string) (int64, error)
+	InsertSessionTimestamp(id string, timeStart int64) error
 }
 
 type useCase struct {
@@ -63,27 +66,45 @@ func (instance *useCase) FindSession(id string) (int64, error) {
 	return count, nil
 }
 
-// GetCountEvent get count event of session by session id
-func (instance *useCase) GetCountEvent(id string, session *models.Session) (int, error) {
-	count, err := instance.repo.GetCountEvent(id, session)
+// GetEvents get event of session by session id
+func (instance *useCase) GetEvents(id string, session *models.Session) (models.Events, error) {
+	events, err := instance.repo.GetEvents(id, session)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return count, nil
+	return events, nil
 }
 
-// GetEvent get limit event of session by session id
-func (instance *useCase) GetEvent(id string, session *models.Session, limit, skip int) error {
-	err := instance.repo.GetEvent(id, session, limit, skip)
+// GetEventByLimitSkip get limit event of session by session id
+func (instance *useCase) GetEventByLimitSkip(id string, session *models.Session, limit, skip int) error {
+	err := instance.repo.GetEventByLimitSkip(id, session, limit, skip)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// UpdateEvent update event of session by session id
-func (instance *useCase) UpdateEvent(session models.Session) error {
-	err := instance.repo.UpdateEvent(session)
+// UpdateSession update duration session and event by session id
+func (instance *useCase) UpdateSession(id string, session models.Session) error {
+	err := instance.repo.UpdateSession(id, session)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetSessionTimestamp get first timestamp of session by id
+func (instance *useCase) GetSessionTimestamp(id string) (int64, error) {
+	timeStart, err := instance.repo.GetSessionTimestamp(id)
+	if err != nil {
+		return 0, err
+	}
+	return timeStart, nil
+}
+
+// InsertSessionTimestamp insert first timestamp by session id
+func (instance *useCase) InsertSessionTimestamp(id string, timeStart int64) error {
+	err := instance.repo.InsertSessionTimestamp(id, timeStart)
 	if err != nil {
 		return err
 	}

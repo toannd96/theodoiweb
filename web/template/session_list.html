@@ -24,8 +24,10 @@
 			{{ range .Sessions }}
 			<a href="/session/{{ .ID }}" class="list-group-item list-group-item-action">
 				<div class="d-flex w-100 justify-content-between">
-					<h5 class="mb-2 mt-1"><span class="badge bg-primary">{{ .OS }}</span></h5>
+					<h5 class="mb-2 mt-1"><span class="badge bg-success">{{ .Device }}</span></h5>
+					<h5 class="mb-2 mt-1"><span class="badge bg-success">{{ .OS }}</span></h5>
 					<h5 class="mb-2 mt-1"><span class="badge bg-success">{{ .Browser }}</span></h5>
+					<small class="text-muted">{{ .Duration }}</small>
 					<small class="text-muted">{{ .CreatedAt }}</small>
 				</div>
 			</a>

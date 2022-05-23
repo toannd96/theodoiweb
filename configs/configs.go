@@ -6,7 +6,9 @@ import (
 	"strconv"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/go-redis/redis"
 	"github.com/joho/godotenv"
+
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -14,20 +16,27 @@ var (
 	Mode       string
 	LogLevel   string
 	ServerPort string
-	QueryLimit string
+	PathGeoDB  string
 
 	Sentry struct {
 		Dsn              string
 		TracesSampleRate float64
 	}
 
-	Database struct {
+	MongoDB struct {
 		Client            *mongo.Database
 		URI               string
 		Name              string
 		UserCollection    string
 		WebsiteCollection string
 		SessionCollection string
+	}
+
+	Redis struct {
+		Client *redis.Client
+		Host   string
+		Port   string
+		URL    string
 	}
 )
 
@@ -39,13 +48,17 @@ func init() {
 	Mode = os.Getenv("MODE")
 	LogLevel = os.Getenv("LOG_LEVEL")
 	ServerPort = os.Getenv("SERVER_PORT")
-	QueryLimit = os.Getenv("QUERY_LIMIT")
+	PathGeoDB = os.Getenv("PATH_GEO_DB")
 
-	Database.URI = os.Getenv("URI")
-	Database.Name = os.Getenv("NAME")
-	Database.UserCollection = os.Getenv("USER_COLLECTION")
-	Database.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
-	Database.SessionCollection = os.Getenv("SESSION_COLLECTION")
+	MongoDB.URI = os.Getenv("URI")
+	MongoDB.Name = os.Getenv("NAME")
+	MongoDB.UserCollection = os.Getenv("USER_COLLECTION")
+	MongoDB.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
+	MongoDB.SessionCollection = os.Getenv("SESSION_COLLECTION")
+
+	Redis.Host = os.Getenv("REDIS_HOST")
+	Redis.Port = os.Getenv("REDIS_PORT")
+	Redis.URL = os.Getenv("REDIS_URL")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")
 	sampleRate, err := strconv.ParseFloat(os.Getenv("SENTRY_TRACE_SAMPLE_RATE"), 32)

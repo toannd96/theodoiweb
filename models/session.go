@@ -1,6 +1,30 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"gopkg.in/mgo.v2/bson"
+)
+
+// Sessions ...
+type Sessions []Session
+
+// Session ...
+type Session struct {
+	ID        string `json:"id"`
+	WebsiteID string `json:"website_id"`
+	Country   string `json:"country"`
+	City      string `json:"city"`
+	Device    string `json:"device"`
+	OS        string `json:"os"`
+	Browser   string `json:"browser"`
+	Language  string `json:"language"`
+	Referral  string `json:"referral"`
+	Duration  string `json:"duration"`
+	CreatedAt string `json:"created_at"`
+	Events    Events `json:"events"`
+}
+
+// Events ...
+type Events []Event
 
 // Event ...
 type Event struct {
@@ -9,18 +33,5 @@ type Event struct {
 	Timestamp int64  `json:"timestamp"`
 }
 
-// Session ...
-type Session struct {
-	ID        string  `json:"id"`
-	WebsiteID string  `json:"website_id"`
-	UserAgent string  `json:"user_agent"`
-	Browser   string  `json:"browser"`
-	Version   string  `json:"version"`
-	OS        string  `json:"os"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt string  `json:"updated_at"`
-	Events    []Event `json:"events"`
+type TimestampStart struct {
 }
-
-// Sessions ...
-type Sessions []Session

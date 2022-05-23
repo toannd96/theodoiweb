@@ -49,7 +49,8 @@ func main() {
 
 	var err error
 
-	db.NewClient()
+	db.NewMongo()
+	db.NewRedis()
 
 	r := gin.Default()
 
