@@ -32,10 +32,11 @@ func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
 	r.StaticFile("/record.js", "./web/static/record.js")
 	r.Use(middleware.CORSMiddleware())
 
-	r.GET("/", instance.RenderListSession)
+	r.GET("/", instance.Home)
 
 	// Register routes session
 	sessionRoutes := r.Group("session")
+	sessionRoutes.GET("/records", instance.RenderListSession)
 	sessionRoutes.POST("/save", instance.SaveSession)
 	sessionRoutes.GET("/:session_id", instance.RenderSessionPlay)
 	sessionRoutes.GET("/event/:session_id", instance.GetEventBySessionID)
@@ -109,6 +110,13 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 			return
 		}
 	}
+}
+
+// Home
+func (instance *httpDelivery) Home(c *gin.Context) {
+	c.HTML(http.StatusOK, "home.html", gin.H{
+		"URL": "http://localhost:3000",
+	})
 }
 
 // RenderSessionPlay replay session by session id

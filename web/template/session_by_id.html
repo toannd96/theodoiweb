@@ -16,19 +16,19 @@
 			<div class="col">
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
-						<li class="breadcrumb-item"><a href="/">Phiên truy cập</a></li>
+						<li class="breadcrumb-item"><a href="/session/records">Phiên truy cập</a></li>
 						<li class="breadcrumb-item active" aria-current="page">Phát lại</li>
 					</ol>
 				</nav>
-				<div class="alert alert-warning" role="alert">
-					Ghi lại và phát lại trang web
 				</div>
+				<div class="alert alert-warning" role="alert">
 			</div>
 			<div class="row mb-3">
 				<div class="col">
 					<span class="badge bg-success">{{ .Session.Device }}</span>
-					<span class="badge bg-success">{{ .Session.OS }}</span>
+					<span class="badge bg-primary">{{ .Session.OS }}</span>
 					<span class="badge bg-success">{{ .Session.Browser }}</span>
+					<span class="badge bg-secondary">{{ .Session.CreatedAt }}</span>
 				</div>
 			</div>
 		</div>

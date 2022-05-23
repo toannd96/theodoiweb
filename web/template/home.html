@@ -13,39 +13,21 @@
 	<div class="container mt-3">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
 				<li class="breadcrumb-item active" aria-current="page">Bản ghi</li>
 			</ol>
 		</nav>
+		<h2 class="mb-3"><a class="navbar-brand" href="/session/records">Phiên truy cập</a></h2>
 
 		<div class="alert alert-warning" role="alert"></div>
-
-		<div id="content">
-			<table class="table table-striped">
-				<tr>
-					<th class="header">Thiết bị</th>
-					<th class="header">Hệ điều hành</th>
-					<th class="header">Trình duyệt</th>
-					<th class="header">Thời lượng</th>
-					<th class="header">Thời gian</th>
-					<th class="header">Video</th>
-				</tr>
-				{{ range .Sessions }}
-				<tr>
-					<td class="mb-2 mt-1">{{ .Device }}</td>
-					<td class="mb-2 mt-1">{{ .OS }}</td>
-					<td class="mb-2 mt-1">{{ .Browser }}</td>
-					<td class="mb-2 mt-1">{{ .Duration }}</td>
-					<td class="mb-2 mt-1">{{ .CreatedAt }}</td>
-					<td>
-						<form action="/session/{{ .ID }}">
-							<input type="submit" value="Play" class="btn btn-primary btn-sm">
-						</form>
-					</td>
-				</tr>
-				{{ end }}
-			</table>
-		</div>
+		
+		<h3 class="mb-3">Bắt đầu sử dụng</h3>
+		<p>Sao chép và dán đoạn mã sau vào trước thẻ <code>&lt;/head&gt;</code> trong mã nguồn của trang web</p>
+		<pre>
+&lt;script type=&quot;application/javascript&quot; src=&quot;{{ .URL }}/record.js&quot; &gt;&lt;/script&gt;
+&lt;script type=&quot;application/javascript&quot;&gt;
+	window.recorder.setSession()
+&lt;/script&gt;
+			</pre>
 	</div>
 </body>
 
