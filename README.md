@@ -29,7 +29,8 @@ go run cmd/analytics/main.go
 ├── configs
 │   └── configs.go
 ├── db
-│   └── conn.go
+│   ├── mongo.go
+│   └── redis.go
 ├── go.mod
 ├── go.sum
 ├── internal
@@ -40,6 +41,11 @@ go run cmd/analytics/main.go
 │   │       ├── repository.go
 │   │       └── usecase.go
 │   └── pkg
+│       ├── duration
+│       │   └── duration.go
+│       ├── geodb
+│       │   ├── geodb.go
+│       │   └── GeoLite2-City.mmdb
 │       ├── log
 │       │   ├── error.go
 │       │   ├── panic.go
