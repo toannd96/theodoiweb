@@ -60,8 +60,12 @@ go run cmd/analytics/main.go
 ├── README.md
 └── web
     ├── static
-    │   └── record.js
-    └── template
-        ├── session_by_id.html
-        └── session_list.html
+    │   └── js
+    │       └── record.js
+    └── templates
+        ├── footer.html
+        ├── guide_tracking.html
+        ├── header.html
+        ├── list_session_record.html
+        └── session_replay.html
 ```
