@@ -1,0 +1,29 @@
+{{ define "guide_tracking.html" }}
+
+{{ template "header.html" }}
+
+<body>
+    <div class="container mt-3">
+        
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Bản ghi</li>
+            </ol>
+        </nav>
+        <h2 class="mb-3"><a class="navbar-brand" href="/session/records">Xem phiên truy cập</a></h2>
+
+        <div class="alert alert-warning" role="alert"></div>
+        <h3 class="mb-3">Bắt đầu sử dụng</h3>
+        <p>Sao chép và dán đoạn mã sau vào trước thẻ <code>&lt;/head&gt;</code> trong mã nguồn của trang web</p>
+        <pre>
+&lt;script type=&quot;application/javascript&quot; src=&quot;{{ .URL }}/record.js&quot; &gt;&lt;/script&gt;
+&lt;script type=&quot;application/javascript&quot;&gt;
+	window.recorder.setSession()
+&lt;/script&gt;
+		</pre>
+    </div>
+</body>
+
+{{ template "footer.html"}}
+
+{{ end }}

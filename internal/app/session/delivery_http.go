@@ -2,16 +2,22 @@ package session
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
+	"net/url"
 	"time"
 
+	"analytics-api/configs"
+	"analytics-api/internal/pkg/duration"
+	"analytics-api/internal/pkg/geodb"
 	"analytics-api/internal/pkg/log"
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mssola/user_agent"
+	ua "github.com/mileusna/useragent"
 	"github.com/sirupsen/logrus"
+	"github.com/tomasen/realip"
 )
 
 type httpDelivery struct {
@@ -26,16 +32,18 @@ type Request struct {
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
-	r.LoadHTMLGlob("web/template/*")
-	r.StaticFile("/record.js", "./web/static/record.js")
+	r.LoadHTMLGlob("web/templates/**")
+	r.StaticFile("/favicon.ico", "./img/favicon.ico")
+	r.StaticFile("/record.js", "./web/static/js/record.js")
 	r.Use(middleware.CORSMiddleware())
 
-	r.GET("/", instance.RenderListSession)
+	r.GET("/", instance.GuideTracking)
 
 	// Register routes session
 	sessionRoutes := r.Group("session")
-	sessionRoutes.POST("/save", instance.SaveSession)
-	sessionRoutes.GET("/:session_id", instance.RenderSessionPlay)
+	sessionRoutes.GET("/records", instance.ListSessionRecord)
+	sessionRoutes.POST("/receive", instance.ReceiveSession)
+	sessionRoutes.GET("/:session_id", instance.SessionReplay)
 	sessionRoutes.GET("/event/:session_id", instance.GetEventBySessionID)
 }
 
@@ -50,12 +58,12 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	limit := 10
 	skip := 0
 
-	countEvent, err := instance.sessionUseCase.GetCountEvent(sessionID, &session)
+	events, err := instance.sessionUseCase.GetEvents(sessionID, &session)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
-	logrus.Debug("count event ", countEvent)
+	logrus.Debug("count event ", len(events))
 
 	msgChan := make(chan []models.Event)
 	breakLineChan := make(chan string)
@@ -68,9 +76,9 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 
 	go func() {
 		if msgChan != nil {
-			for skip <= int(countEvent) {
+			for skip <= int(len(events)) {
 				var session models.Session
-				err := instance.sessionUseCase.GetEvent(sessionID, &session, limit, skip)
+				err := instance.sessionUseCase.GetEventByLimitSkip(sessionID, &session, limit, skip)
 				if err != nil {
 					log.LogError(c, err)
 					return
@@ -109,8 +117,15 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	}
 }
 
-// RenderSessionPlay replay session by session id
-func (instance *httpDelivery) RenderSessionPlay(c *gin.Context) {
+// GuideTracking guide tracking code to website
+func (instance *httpDelivery) GuideTracking(c *gin.Context) {
+	c.HTML(http.StatusOK, "guide_tracking.html", gin.H{
+		"URL": configs.AppURL,
+	})
+}
+
+// SessionReplay replay session by session id
+func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 	sessionID := c.Param("session_id")
 	var session models.Session
 	err := instance.sessionUseCase.GetSession(sessionID, &session)
@@ -118,28 +133,28 @@ func (instance *httpDelivery) RenderSessionPlay(c *gin.Context) {
 		log.LogError(c, err)
 		return
 	}
-	c.HTML(http.StatusOK, "session_by_id.html", gin.H{
+	c.HTML(http.StatusOK, "session_replay.html", gin.H{
 		"SessionID": sessionID,
 		"Session":   session,
 	})
 }
 
-// RenderListSession show list session record
-func (instance *httpDelivery) RenderListSession(c *gin.Context) {
+// ListSessionRecord show list session record
+func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	var sessions models.Sessions
 	sessions, err := instance.sessionUseCase.GetAllSession(sessions)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
-	c.HTML(http.StatusOK, "session_list.html", gin.H{
+	c.HTML(http.StatusOK, "list_session_record.html", gin.H{
 		"Sessions": sessions,
-		"URL":      "http://localhost:3000",
+		"URL":      configs.AppURL,
 	})
 }
 
-// SaveSession save session
-func (instance *httpDelivery) SaveSession(c *gin.Context) {
+// ReceiveSession receive session from request client
+func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 	var request Request
 	var session models.Session
 
@@ -153,18 +168,66 @@ func (instance *httpDelivery) SaveSession(c *gin.Context) {
 		log.LogError(c, err)
 		return
 	}
+
 	// if session id not exists
 	if countSessionID == 0 {
-		ua := user_agent.New(c.Request.UserAgent())
-		browserName, browserVersion := ua.Browser()
+		ua := ua.Parse(c.Request.UserAgent())
+		clientIP := net.ParseIP(realip.FromRequest(c.Request))
 
-		session.OS = ua.OS()
-		session.Browser = browserName
-		session.Version = browserVersion
+		geoDB, err := geodb.Open(configs.PathGeoDB)
+		if err != nil {
+			log.LogError(c, err)
+			return
+		}
+		defer geoDB.Close()
+
+		geoData, err := geoDB.City(clientIP)
+		if err != nil {
+			log.LogError(c, err)
+			return
+		}
+
+		referrerURL, err := url.Parse(c.Request.Referer())
+		if err != nil {
+			log.LogError(c, err)
+			return
+		}
+
 		session.ID = request.SessionID
-		session.UserAgent = c.Request.UserAgent()
-		session.CreatedAt = time.Now().Format("02/01/2006, 15:04:05")
+		session.OS = ua.OS
+		session.Browser = ua.Name
+		session.BrowserVersion = ua.Version
+
+		if ua.Mobile {
+			session.Device = "Mobile"
+		}
+		if ua.Tablet {
+			session.Device = "Tablet"
+		}
+		if ua.Desktop {
+			session.Device = "Desktop"
+		}
+
+		session.Referral = referrerURL.Hostname()
+		session.Country = geoData.Country.Names["en"]
+		session.City = geoData.City.Names["en"]
+
 		session.Events = append(session.Events, request.Events...)
+
+		if len(session.Events) != 0 {
+			time1 := session.Events[0].Timestamp / 1000
+			time2 := session.Events[len(session.Events)-1].Timestamp / 1000
+			duration := duration.Duration(time1, time2)
+			session.Duration = duration
+			session.CreatedAt = time.Unix(time1, 0).Format("02/01/2006, 15:04:05")
+
+			// save time1 of session id to redis
+			err = instance.sessionUseCase.InsertSessionTimestamp(request.SessionID, time1)
+			if err != nil {
+				log.LogError(c, err)
+				return
+			}
+		}
 
 		// save session
 		err = instance.sessionUseCase.InsertSession(session)
@@ -172,15 +235,27 @@ func (instance *httpDelivery) SaveSession(c *gin.Context) {
 			log.LogError(c, err)
 			return
 		}
-	} else {
-		// update events
-		session.ID = request.SessionID
-		session.Events = append(session.Events, request.Events...)
-		errEvent := instance.sessionUseCase.UpdateEvent(session)
+	}
+
+	// update session
+	session.Events = append(session.Events, request.Events...)
+	if len(session.Events) != 0 {
+		// get time1 by session id from redis
+		time1, err := instance.sessionUseCase.GetSessionTimestamp(request.SessionID)
+		if err != nil {
+			log.LogError(c, err)
+			return
+		}
+		time2 := session.Events[len(session.Events)-1].Timestamp / 1000
+		duration := duration.Duration(time1, time2)
+		session.Duration = duration
+
+		errEvent := instance.sessionUseCase.UpdateSession(request.SessionID, session)
 		if errEvent != nil {
 			log.LogError(c, errEvent)
 			return
 		}
 	}
+
 	c.JSON(http.StatusOK, session)
 }
