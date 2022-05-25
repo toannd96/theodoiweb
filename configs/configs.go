@@ -16,6 +16,7 @@ var (
 	Mode       string
 	LogLevel   string
 	ServerPort string
+	AppURL     string
 	PathGeoDB  string
 
 	Sentry struct {
@@ -48,6 +49,7 @@ func init() {
 	Mode = os.Getenv("MODE")
 	LogLevel = os.Getenv("LOG_LEVEL")
 	ServerPort = os.Getenv("SERVER_PORT")
+	AppURL = os.Getenv("APP_URL")
 	PathGeoDB = os.Getenv("PATH_GEO_DB")
 
 	MongoDB.URI = os.Getenv("URI")

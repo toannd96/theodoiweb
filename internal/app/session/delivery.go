@@ -11,9 +11,10 @@ type HTTPDelivery interface {
 
 	// Other functions to handle HTTP requests
 	GetEventBySessionID(c *gin.Context)
-	RenderSessionPlay(c *gin.Context)
-	RenderListSession(c *gin.Context)
-	SaveSession(c *gin.Context)
+	GuideTracking(c *gin.Context)
+	SessionReplay(c *gin.Context)
+	ListSessionRecord(c *gin.Context)
+	ReceiveSession(c *gin.Context)
 }
 
 // NewHTTPDelivery ...

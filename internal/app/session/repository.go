@@ -125,7 +125,7 @@ func (instance *repository) UpdateSession(id string, session models.Session) err
 
 // InsertSessionTimestamp insert first timestamp by session id
 func (instance *repository) InsertSessionTimestamp(id string, timeStart int64) error {
-	err := configs.Redis.Client.Set(id, timeStart, 180*24*time.Hour).Err()
+	err := configs.Redis.Client.Set(id, timeStart, 24*time.Hour).Err()
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,62 @@
+{{ define "list_session_record.html" }}
+
+{{ template "header.html"}}
+
+<body>
+	<div class="container mt-3">
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Bản ghi</li>
+			</ol>
+		</nav>
+		
+		<div class="alert alert-warning" role="alert"></div>
+
+		<div id="content">
+			<table class="table table-striped">
+				<tr>
+					<th class="header">Quốc gia</th>
+					<th class="header">Thành phố</th>
+					<th class="header">URL giới thiệu</th>
+					<th class="header">Thiết bị</th>
+					<th class="header">Hệ điều hành</th>
+					<th class="header">Trình duyệt</th>
+					<th class="header">Phiên bản</th>
+					<th class="header">Thời lượng</th>
+					<th class="header">Thời gian khởi tạo</th>
+					<th class="header">Video</th>
+				</tr>
+				{{ range .Sessions }}
+				<tr>
+					<td class="mb-2 mt-1">{{ .Country }}</td>
+					<td class="mb-2 mt-1">{{ .City }}</td>
+					<td class="mb-2 mt-1">{{ .Referral }}</td>
+					<td class="mb-2 mt-1">{{ .Device }}</td>
+					<td class="mb-2 mt-1">{{ .OS }}</td>
+					<td class="mb-2 mt-1">{{ .Browser }}</td>
+					<td class="mb-2 mt-1">{{ .BrowserVersion }}</td>
+					<td class="mb-2 mt-1">{{ .Duration }}</td>
+					<td class="mb-2 mt-1">{{ .CreatedAt }}</td>
+					<td>
+						<form action="/session/{{ .ID }}">
+							<button class="btn btn-success btn-sm"><i class="fa fa-play"></i></button>
+						</form>
+					</td>
+				</tr>
+				{{ end }}
+			</table>
+		</div>
+		<style>
+			.btn {
+				outline-style: initial;
+				border-radius: 100px;
+			}
+		</style>
+	</div>
+</body>
+
+{{ template "footer.html"}}
+
+{{ end }}
