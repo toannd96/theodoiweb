@@ -2,7 +2,7 @@
 
 ### Install dependencies
 
-- [golang: version 1.18](https://go.dev/doc/install)
+- [golang version 1.18](https://go.dev/doc/install)
 - [mongodb on ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-20-04)
 - [setup mongodb atlas](https://www.mongodb.com/developer/how-to/use-atlas-on-heroku/)
 
