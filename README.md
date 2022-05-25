@@ -21,7 +21,7 @@ Referring from these repositories
 - Run
 
 ```
-go run cmd/analytics/main.go
+go run main.go
 ```
 
 ## Folder structure
