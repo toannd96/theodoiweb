@@ -35,9 +35,9 @@ var (
 
 	Redis struct {
 		Client *redis.Client
-		Host   string
-		Port   string
-		URL    string
+		// Host   string
+		// Port   string
+		URL string
 	}
 )
 
@@ -48,7 +48,7 @@ func init() {
 
 	Mode = os.Getenv("MODE")
 	LogLevel = os.Getenv("LOG_LEVEL")
-	ServerPort = os.Getenv("SERVER_PORT")
+	ServerPort = os.Getenv("PORT")
 	AppURL = os.Getenv("APP_URL")
 	PathGeoDB = os.Getenv("PATH_GEO_DB")
 
@@ -58,8 +58,8 @@ func init() {
 	MongoDB.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
 	MongoDB.SessionCollection = os.Getenv("SESSION_COLLECTION")
 
-	Redis.Host = os.Getenv("REDIS_HOST")
-	Redis.Port = os.Getenv("REDIS_PORT")
+	// Redis.Host = os.Getenv("REDIS_HOST")
+	// Redis.Port = os.Getenv("REDIS_PORT")
 	Redis.URL = os.Getenv("REDIS_URL")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")

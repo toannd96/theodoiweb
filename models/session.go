@@ -17,7 +17,6 @@ type Session struct {
 	OS             string `json:"os"`
 	Browser        string `json:"browser"`
 	BrowserVersion string `json:"browser_version"`
-	Referral       string `json:"referral"`
 	Duration       string `json:"duration"`
 	CreatedAt      string `json:"created_at"`
 	Events         Events `json:"events"`

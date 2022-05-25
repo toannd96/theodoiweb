@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
-	"net/url"
 	"time"
 
 	"analytics-api/configs"
@@ -187,12 +186,6 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			return
 		}
 
-		referrerURL, err := url.Parse(c.Request.Referer())
-		if err != nil {
-			log.LogError(c, err)
-			return
-		}
-
 		session.ID = request.SessionID
 		session.OS = ua.OS
 		session.Browser = ua.Name
@@ -208,7 +201,6 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			session.Device = "Desktop"
 		}
 
-		session.Referral = referrerURL.Hostname()
 		session.Country = geoData.Country.Names["en"]
 		session.City = geoData.City.Names["en"]
 
