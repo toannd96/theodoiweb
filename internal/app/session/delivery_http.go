@@ -219,6 +219,9 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				log.LogError(c, err)
 				return
 			}
+		} else {
+			session.Duration = "00:00:00"
+			session.CreatedAt = time.Now().Format("02/01/2006, 15:04:05")
 		}
 
 		// save session
