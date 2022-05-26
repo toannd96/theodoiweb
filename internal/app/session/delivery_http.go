@@ -12,6 +12,7 @@ import (
 	"analytics-api/internal/pkg/log"
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/models"
+	"analytics-api/pkg"
 
 	"github.com/gin-gonic/gin"
 	ua "github.com/mileusna/useragent"
@@ -202,7 +203,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 		}
 
 		session.Country = geoData.Country.Names["en"]
-		session.City = geoData.City.Names["en"]
+		session.City = pkg.RemoveSubstring(geoData.City.Names["en"], "City")
 
 		session.Events = append(session.Events, request.Events...)
 
