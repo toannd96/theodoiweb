@@ -2,12 +2,12 @@ package session
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"time"
 
 	"analytics-api/configs"
 	"analytics-api/models"
+	"analytics-api/pkg"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
@@ -15,17 +15,16 @@ import (
 
 // Repository ...
 type Repository interface {
-	GetAllSession(sessions models.Sessions) (models.Sessions, error)
-	GetSession(id string, session *models.Session) error
-	InsertSession(session models.Session) error
-	FindSession(id string) (int64, error)
-	UpdateSession(id string, session models.Session) error
+	GetAllSession(listSessionID []string, session models.Session) ([]models.MetaData, error)
+	GetAllSessionID(sessionMetaData models.MetaData) ([]string, error)
+	GetSession(sessionID string, session *models.Session) error
+	GetCountSession(sessionID string) (int64, error)
+	InsertSession(session models.Session, event models.Event) error
 
-	GetEvents(id string, session *models.Session) (models.Events, error)
-	GetEventByLimitSkip(id string, session *models.Session, limit, skip int) error
+	GetEventByLimitSkip(sessionID string, limit, skip int) ([]*models.Event, error)
 
-	GetSessionTimestamp(id string) (int64, error)
-	InsertSessionTimestamp(id string, timeStart int64) error
+	GetSessionTimestamp(sessionID string) (int64, error)
+	InsertSessionTimestamp(sessionID string, timeStart int64) error
 }
 
 type repository struct{}
@@ -36,9 +35,9 @@ func NewRepository() Repository {
 }
 
 // GetSession get session by session id
-func (instance *repository) GetSession(id string, session *models.Session) error {
+func (instance *repository) GetSession(sessionID string, session *models.Session) error {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	err := sessionCollection.FindOne(context.TODO(), bson.M{"id": id}).Decode(&session)
+	err := sessionCollection.FindOne(context.TODO(), bson.M{"id": sessionID}).Decode(&session.MetaData)
 	if err != nil {
 		return err
 	}
@@ -46,86 +45,119 @@ func (instance *repository) GetSession(id string, session *models.Session) error
 }
 
 // GetAllSession get all session
-func (instance *repository) GetAllSession(sessions models.Sessions) (models.Sessions, error) {
+func (instance *repository) GetAllSession(listSessionID []string, session models.Session) ([]models.MetaData, error) {
+	var sessionMetaData []models.MetaData
+	opt := options.FindOne()
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	cursor, err := sessionCollection.Find(context.Background(), bson.M{})
+
+	for _, sessionID := range listSessionID {
+		count, err := sessionCollection.CountDocuments(context.TODO(), bson.M{"id": sessionID})
+		if err != nil {
+			return nil, err
+		}
+
+		opt.SetSkip(count - 1)
+		err = sessionCollection.FindOne(context.TODO(), bson.M{"id": sessionID}, opt).Decode(&session.MetaData)
+		if err != nil {
+			return nil, err
+		}
+		sessionMetaData = append(sessionMetaData, session.MetaData)
+	}
+	return sessionMetaData, nil
+}
+
+// GetAllSessionID get all id of session
+func (instance *repository) GetAllSessionID(sessionMetaData models.MetaData) ([]string, error) {
+	var listSessionID []string
+
+	fromDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	toDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 24, 0, 0, 0, time.UTC)
+
+	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
+	cursor, err := sessionCollection.Find(context.TODO(), bson.M{"created_at": bson.M{
+		"$gt": fromDate,
+		"$lt": toDate,
+	}})
 	if err != nil {
 		return nil, err
 	}
-	if err = cursor.All(context.TODO(), &sessions); err != nil {
-		return nil, err
+	for cursor.Next(context.TODO()) {
+		err := cursor.Decode(&sessionMetaData)
+		if err != nil {
+			return nil, err
+		}
+		listSessionID = append(listSessionID, sessionMetaData.ID)
 	}
-	return sessions, nil
+	listSessionID = pkg.RemoveDuplicateValues(listSessionID)
+	return listSessionID, nil
 }
 
 // InsertSession insert session
-func (instance *repository) InsertSession(session models.Session) error {
+func (instance *repository) InsertSession(session models.Session, event models.Event) error {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	_, err := sessionCollection.InsertOne(context.TODO(), session)
+	docs := bson.M{
+		"id":         session.MetaData.ID,
+		"website_id": session.MetaData.WebsiteID,
+		"country":    session.MetaData.Country,
+		"city":       session.MetaData.City,
+		"device":     session.MetaData.Device,
+		"os":         session.MetaData.OS,
+		"browser":    session.MetaData.Browser,
+		"version":    session.MetaData.Version,
+		"duration":   session.MetaData.Duration,
+		"created":    session.MetaData.Created,
+		"created_at": session.CreatedAt,
+		"event":      event,
+	}
+	_, err := sessionCollection.InsertOne(context.TODO(), docs)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// FindSession find session id to check exists
-func (instance *repository) FindSession(id string) (int64, error) {
+// GetCountSession get count session of session id
+func (instance *repository) GetCountSession(sessionID string) (int64, error) {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	count, err := sessionCollection.CountDocuments(context.TODO(), bson.M{"id": id})
+	count, err := sessionCollection.CountDocuments(context.TODO(), bson.M{"id": sessionID})
 	if err != nil {
 		return 0, err
 	}
 	return count, nil
 }
 
-// GetEvents get event of session by session id
-func (instance *repository) GetEvents(id string, session *models.Session) (models.Events, error) {
+func (instance *repository) GetEventByLimitSkip(sessionID string, limit, skip int) ([]*models.Event, error) {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	err := sessionCollection.FindOne(context.TODO(), bson.M{"id": id}).Decode(&session)
+
+	filter := bson.M{"id": sessionID}
+	findOptions := options.Find()
+	findOptions.SetSkip(int64(skip)).SetLimit(int64(limit))
+
+	cur, err := sessionCollection.Find(context.TODO(), filter, findOptions)
 	if err != nil {
 		return nil, err
 	}
-	return session.Events, nil
-}
 
-// GetEventByLimitSkip get limit event of session by session id
-func (instance *repository) GetEventByLimitSkip(id string, session *models.Session, limit, skip int) error {
-	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	filter := bson.M{"id": id}
-	opt := options.FindOneOptions{
-		Projection: bson.M{"events": bson.M{"$slice": []int{skip, limit}}},
+	var events []*models.Event
+	for cur.Next(context.TODO()) {
+		var session models.Session
+		err := cur.Decode(&session)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, &session.Event)
 	}
-	err := sessionCollection.FindOne(context.TODO(), filter, &opt).Decode(&session)
-	if err != nil {
-		return err
+	if err := cur.Err(); err != nil {
+		return nil, err
 	}
-	return nil
-}
 
-// UpdateSession update duration session and event by session id
-func (instance *repository) UpdateSession(id string, session models.Session) error {
-	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	upsert := true
-	filter := bson.M{"id": id}
-	for _, event := range session.Events {
-		update := bson.M{
-			"$set":  bson.M{"duration": session.Duration},
-			"$push": bson.M{"events": event},
-		}
-		opt := options.FindOneAndUpdateOptions{
-			Upsert: &upsert,
-		}
-		result := sessionCollection.FindOneAndUpdate(context.Background(), filter, update, &opt)
-		if result.Err() != nil {
-			log.Printf("update failed: %v\n", result.Err())
-		}
-	}
-	return nil
+	defer cur.Close(context.TODO())
+	return events, nil
 }
 
 // InsertSessionTimestamp insert first timestamp by session id
-func (instance *repository) InsertSessionTimestamp(id string, timeStart int64) error {
-	err := configs.Redis.Client.Set(id, timeStart, 24*time.Hour).Err()
+func (instance *repository) InsertSessionTimestamp(sessionID string, timeStart int64) error {
+	err := configs.Redis.Client.Set(sessionID, timeStart, 24*time.Hour).Err()
 	if err != nil {
 		return err
 	}
@@ -133,8 +165,8 @@ func (instance *repository) InsertSessionTimestamp(id string, timeStart int64) e
 }
 
 // GetSessionTimestamp get first timestamp by session id
-func (instance *repository) GetSessionTimestamp(id string) (int64, error) {
-	timeStartStr, err := configs.Redis.Client.Get(id).Result()
+func (instance *repository) GetSessionTimestamp(sessionID string) (int64, error) {
+	timeStartStr, err := configs.Redis.Client.Get(sessionID).Result()
 	if err != nil {
 		return 0, err
 	}

@@ -1,6 +1,8 @@
 package duration
 
-import "time"
+import (
+	"time"
+)
 
 func Duration(time1, time2 int64) string {
 	t1 := time.Unix(time1, 0)

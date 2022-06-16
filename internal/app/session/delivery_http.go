@@ -52,20 +52,18 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(200)
 
-	var session models.Session
-
 	sessionID := c.Param("session_id")
 	limit := 10
 	skip := 0
 
-	events, err := instance.sessionUseCase.GetEvents(sessionID, &session)
+	countSession, err := instance.sessionUseCase.GetCountSession(sessionID)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
-	logrus.Debug("count event ", len(events))
+	logrus.Debug("count event ", countSession)
 
-	msgChan := make(chan []models.Event)
+	msgChan := make(chan []*models.Event)
 	breakLineChan := make(chan string)
 	breakChan := make(chan bool)
 	defer func() {
@@ -76,19 +74,18 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 
 	go func() {
 		if msgChan != nil {
-			for skip <= int(len(events)) {
-				var session models.Session
-				err := instance.sessionUseCase.GetEventByLimitSkip(sessionID, &session, limit, skip)
+			for skip <= int(countSession) {
+				events, err := instance.sessionUseCase.GetEventByLimitSkip(sessionID, limit, skip)
 				if err != nil {
 					log.LogError(c, err)
 					return
 				}
 				skip = skip + limit
-
-				msgChan <- session.Events
+				logrus.Debug("len events", len(events))
+				msgChan <- events
 				breakLineChan <- "--break--"
 
-				if len(session.Events) < limit {
+				if len(events) < limit {
 					breakChan <- true
 					return
 				}
@@ -135,22 +132,29 @@ func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 	}
 	c.HTML(http.StatusOK, "session_replay.html", gin.H{
 		"SessionID": sessionID,
-		"Session":   session,
+		"Session":   session.MetaData,
 	})
 }
 
 // ListSessionRecord show list session record
 func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
-	var sessions models.Sessions
-	sessions, err := instance.sessionUseCase.GetAllSession(sessions)
+	var session models.Session
+	listSessionID, err := instance.sessionUseCase.GetAllSessionID(session.MetaData)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
-	c.HTML(http.StatusOK, "list_session_record.html", gin.H{
-		"Sessions": sessions,
-		"URL":      configs.AppURL,
-	})
+	if len(listSessionID) != 0 {
+		sessionMetaData, err := instance.sessionUseCase.GetAllSession(listSessionID, session)
+		if err != nil {
+			log.LogError(c, err)
+			return
+		}
+		c.HTML(http.StatusOK, "list_session_record.html", gin.H{
+			"Sessions": sessionMetaData,
+			"URL":      configs.AppURL,
+		})
+	}
 }
 
 // ReceiveSession receive session from request client
@@ -163,56 +167,57 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	countSessionID, err := instance.sessionUseCase.FindSession(request.SessionID)
+
+	ua := ua.Parse(c.Request.UserAgent())
+	clientIP := net.ParseIP(realip.FromRequest(c.Request))
+
+	geoDB, err := geodb.Open(configs.PathGeoDB)
+	if err != nil {
+		log.LogError(c, err)
+		return
+	}
+	defer geoDB.Close()
+
+	geoData, err := geoDB.City(clientIP)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
 
-	// if session id not exists
-	if countSessionID == 0 {
-		ua := ua.Parse(c.Request.UserAgent())
-		clientIP := net.ParseIP(realip.FromRequest(c.Request))
+	session.MetaData.ID = request.SessionID
+	session.MetaData.OS = ua.OS
+	session.MetaData.Browser = ua.Name
+	session.MetaData.Version = ua.Version
 
-		geoDB, err := geodb.Open(configs.PathGeoDB)
-		if err != nil {
-			log.LogError(c, err)
-			return
-		}
-		defer geoDB.Close()
+	if ua.Mobile {
+		session.MetaData.Device = "Mobile"
+	}
+	if ua.Tablet {
+		session.MetaData.Device = "Tablet"
+	}
+	if ua.Desktop {
+		session.MetaData.Device = "Desktop"
+	}
 
-		geoData, err := geoDB.City(clientIP)
-		if err != nil {
-			log.LogError(c, err)
-			return
-		}
+	session.MetaData.Country = geoData.Country.Names["en"]
+	session.MetaData.City = pkg.RemoveSubstring(geoData.City.Names["en"], "City")
 
-		session.ID = request.SessionID
-		session.OS = ua.OS
-		session.Browser = ua.Name
-		session.BrowserVersion = ua.Version
+	events := request.Events
 
-		if ua.Mobile {
-			session.Device = "Mobile"
-		}
-		if ua.Tablet {
-			session.Device = "Tablet"
-		}
-		if ua.Desktop {
-			session.Device = "Desktop"
-		}
-
-		session.Country = geoData.Country.Names["en"]
-		session.City = pkg.RemoveSubstring(geoData.City.Names["en"], "City")
-
-		session.Events = append(session.Events, request.Events...)
-
-		if len(session.Events) != 0 {
-			time1 := session.Events[0].Timestamp / 1000
-			time2 := session.Events[len(session.Events)-1].Timestamp / 1000
+	countSession, err := instance.sessionUseCase.GetCountSession(request.SessionID)
+	if err != nil {
+		log.LogError(c, err)
+		return
+	}
+	if countSession == 0 {
+		if len(events) != 0 {
+			time1 := events[0].Timestamp / 1000
+			time2 := events[len(events)-1].Timestamp / 1000
 			duration := duration.Duration(time1, time2)
-			session.Duration = duration
-			session.CreatedAt = time.Unix(time1, 0).Format("02/01/2006, 15:04:05")
+
+			session.MetaData.Duration = duration
+			session.MetaData.Created = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
+			session.CreatedAt = time.Unix(time1, 0).UTC()
 
 			// save time1 of session id to redis
 			err = instance.sessionUseCase.InsertSessionTimestamp(request.SessionID, time1)
@@ -221,37 +226,31 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				return
 			}
 		} else {
-			session.Duration = "00:00:00"
-			session.CreatedAt = time.Now().Format("02/01/2006, 15:04:05")
+			session.MetaData.Duration = "00:00:00"
+			session.MetaData.Created = time.Now().Format("2006-01-02, 15:04:05")
+			session.CreatedAt = time.Now().UTC()
 		}
-
-		// save session
-		err = instance.sessionUseCase.InsertSession(session)
-		if err != nil {
-			log.LogError(c, err)
-			return
-		}
-	}
-
-	// update session
-	session.Events = append(session.Events, request.Events...)
-	if len(session.Events) != 0 {
-		// get time1 by session id from redis
-		time1, err := instance.sessionUseCase.GetSessionTimestamp(request.SessionID)
-		if err != nil {
-			log.LogError(c, err)
-			return
-		}
-		time2 := session.Events[len(session.Events)-1].Timestamp / 1000
-		duration := duration.Duration(time1, time2)
-		session.Duration = duration
-
-		errEvent := instance.sessionUseCase.UpdateSession(request.SessionID, session)
-		if errEvent != nil {
-			log.LogError(c, errEvent)
-			return
+	} else {
+		if len(events) != 0 {
+			// get time1 by session id from redis
+			time1, err := instance.sessionUseCase.GetSessionTimestamp(request.SessionID)
+			if err != nil {
+				log.LogError(c, err)
+				return
+			}
+			time2 := events[len(events)-1].Timestamp / 1000
+			duration := duration.Duration(time1, time2)
+			session.MetaData.Duration = duration
+			session.MetaData.Created = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
+			session.CreatedAt = time.Now().UTC()
 		}
 	}
 
+	// save session
+	err = instance.sessionUseCase.InsertSession(session, events)
+	if err != nil {
+		log.LogError(c, err)
+		return
+	}
 	c.JSON(http.StatusOK, session)
 }
