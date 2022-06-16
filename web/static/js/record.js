@@ -41,7 +41,7 @@ window.recorder = {
 	start() {
 		window.recorder.runner = setInterval(function receive() {
 			const session = window.recorder.session.get();
-			fetch('https://theodoi-web.herokuapp.com/session/receive', {
+			fetch('http://localhost:3000/session/receive', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(Object.assign({}, { events: window.recorder.events }, session)),

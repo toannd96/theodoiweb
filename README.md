@@ -29,44 +29,47 @@ go run main.go
 ```
 .
 ├── configs
-│   └── configs.go
+│   └── configs.go
 ├── db
-│   ├── mongo.go
-│   └── redis.go
+│   ├── mongo.go
+│   └── redis.go
 ├── Dockerfile
 ├── go.mod
 ├── go.sum
 ├── heroku.yml
 ├── internal
-│   ├── app
-│   │   └── session
-│   │       ├── delivery.go
-│   │       ├── delivery_http.go
-│   │       ├── repository.go
-│   │       └── usecase.go
-│   └── pkg
-│       ├── duration
-│       │   └── duration.go
-│       ├── geodb
-│       │   ├── geodb.go
-│       │   └── GeoLite2-City.mmdb
-│       ├── log
-│       │   ├── error.go
-│       │   ├── panic.go
-│       │   └── sentry.go
-│       └── middleware
-│           └── cors.go
+│   ├── app
+│   │   └── session
+│   │       ├── delivery.go
+│   │       ├── delivery_http.go
+│   │       ├── repository.go
+│   │       └── usecase.go
+│   └── pkg
+│       ├── duration
+│       │   └── duration.go
+│       ├── geodb
+│       │   ├── geodb.go
+│       │   └── GeoLite2-City.mmdb
+│       ├── log
+│       │   ├── error.go
+│       │   ├── panic.go
+│       │   └── sentry.go
+│       └── middleware
+│           └── cors.go
 ├── main.go
 ├── models
-│   ├── session.go
-│   ├── user.go
-│   └── website.go
+│   ├── session.go
+│   ├── user.go
+│   └── website.go
+├── pkg
+│   ├── duplicate.go
+│   └── string.go
 ├── Procfile
 ├── README.md
 └── web
     ├── static
-    │   └── js
-    │       └── record.js
+    │   └── js
+    │       └── record.js
     └── templates
         ├── footer.html
         ├── guide_tracking.html

@@ -50,6 +50,8 @@ func main() {
 	var err error
 
 	db.NewMongo()
+	db.CreateSessionCollection()
+
 	db.NewRedis()
 
 	r := gin.Default()

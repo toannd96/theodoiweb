@@ -1,29 +1,31 @@
 package models
 
 import (
+	"time"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Sessions ...
-type Sessions []Session
-
 // Session ...
 type Session struct {
-	ID             string `json:"id"`
-	WebsiteID      string `json:"website_id"`
-	Country        string `json:"country"`
-	City           string `json:"city"`
-	Device         string `json:"device"`
-	OS             string `json:"os"`
-	Browser        string `json:"browser"`
-	BrowserVersion string `json:"browser_version"`
-	Duration       string `json:"duration"`
-	CreatedAt      string `json:"created_at"`
-	Events         Events `json:"events"`
+	MetaData  MetaData  `json:"meta_data"`
+	CreatedAt time.Time `json:"created_at"`
+	Event     Event     `json:"event"`
 }
 
-// Events ...
-type Events []Event
+// MetaData ...
+type MetaData struct {
+	ID        string `json:"id"`
+	WebsiteID string `json:"websiteID"`
+	Country   string `json:"country"`
+	City      string `json:"city"`
+	Device    string `json:"device"`
+	OS        string `json:"os"`
+	Browser   string `json:"browser"`
+	Version   string `json:"version"`
+	Duration  string `json:"duration"`
+	Created   string `json:"created"`
+}
 
 // Event ...
 type Event struct {
