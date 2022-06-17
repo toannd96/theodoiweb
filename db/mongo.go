@@ -35,7 +35,7 @@ func CreateSessionCollection() error {
 		ts := options.
 			TimeSeries().
 			SetMetaField("meta_data").
-			SetTimeField("created_at").
+			SetTimeField("time_report").
 			SetGranularity("seconds")
 		opts := options.
 			CreateCollection().

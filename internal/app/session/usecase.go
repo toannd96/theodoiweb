@@ -6,8 +6,8 @@ import (
 
 // UseCase ...
 type UseCase interface {
-	GetAllSession(listSessionID []string, session models.Session) ([]models.MetaData, error)
-	GetAllSessionID(sessionMetaData models.MetaData) ([]string, error)
+	GetAllSession(listSessionID []string, session models.Session) ([]models.Session, error)
+	GetAllSessionID(session models.Session) ([]string, error)
 	GetSession(sessionID string, session *models.Session) error
 	GetCountSession(sessionID string) (int64, error)
 	InsertSession(session models.Session, events []models.Event) error
@@ -39,17 +39,17 @@ func (instance *useCase) GetSession(sessionID string, session *models.Session) e
 }
 
 // GetAllSession get all session
-func (instance *useCase) GetAllSession(listSessionID []string, session models.Session) ([]models.MetaData, error) {
-	sessionMetaData, err := instance.repo.GetAllSession(listSessionID, session)
+func (instance *useCase) GetAllSession(listSessionID []string, session models.Session) ([]models.Session, error) {
+	listSession, err := instance.repo.GetAllSession(listSessionID, session)
 	if err != nil {
 		return nil, err
 	}
-	return sessionMetaData, nil
+	return listSession, nil
 }
 
 // GetAllSessionID get all id of session
-func (instance *useCase) GetAllSessionID(sessionMetaData models.MetaData) ([]string, error) {
-	listSessionID, err := instance.repo.GetAllSessionID(sessionMetaData)
+func (instance *useCase) GetAllSessionID(session models.Session) ([]string, error) {
+	listSessionID, err := instance.repo.GetAllSessionID(session)
 	if err != nil {
 		return nil, err
 	}
