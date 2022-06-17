@@ -81,7 +81,7 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 					return
 				}
 				skip = skip + limit
-				logrus.Debug("len events", len(events))
+				logrus.Debug("len events ", len(events))
 				msgChan <- events
 				breakLineChan <- "--break--"
 
@@ -139,19 +139,19 @@ func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 // ListSessionRecord show list session record
 func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	var session models.Session
-	listSessionID, err := instance.sessionUseCase.GetAllSessionID(session.MetaData)
+	listSessionID, err := instance.sessionUseCase.GetAllSessionID(session)
 	if err != nil {
 		log.LogError(c, err)
 		return
 	}
 	if len(listSessionID) != 0 {
-		sessionMetaData, err := instance.sessionUseCase.GetAllSession(listSessionID, session)
+		listSession, err := instance.sessionUseCase.GetAllSession(listSessionID, session)
 		if err != nil {
 			log.LogError(c, err)
 			return
 		}
 		c.HTML(http.StatusOK, "list_session_record.html", gin.H{
-			"Sessions": sessionMetaData,
+			"Sessions": listSession,
 			"URL":      configs.AppURL,
 		})
 	}
@@ -215,9 +215,9 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			time2 := events[len(events)-1].Timestamp / 1000
 			duration := duration.Duration(time1, time2)
 
-			session.MetaData.Duration = duration
-			session.MetaData.Created = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
-			session.CreatedAt = time.Unix(time1, 0).UTC()
+			session.Duration = duration
+			session.TimeReport = time.Unix(time1, 0).UTC()
+			session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 
 			// save time1 of session id to redis
 			err = instance.sessionUseCase.InsertSessionTimestamp(request.SessionID, time1)
@@ -226,9 +226,9 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				return
 			}
 		} else {
-			session.MetaData.Duration = "00:00:00"
-			session.MetaData.Created = time.Now().Format("2006-01-02, 15:04:05")
-			session.CreatedAt = time.Now().UTC()
+			session.Duration = "00:00:00"
+			session.TimeReport = time.Now().UTC()
+			session.MetaData.CreatedAt = time.Now().Format("2006-01-02, 15:04:05")
 		}
 	} else {
 		if len(events) != 0 {
@@ -240,9 +240,9 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			}
 			time2 := events[len(events)-1].Timestamp / 1000
 			duration := duration.Duration(time1, time2)
-			session.MetaData.Duration = duration
-			session.MetaData.Created = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
-			session.CreatedAt = time.Now().UTC()
+			session.Duration = duration
+			session.TimeReport = time.Now().UTC()
+			session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 		}
 	}
 

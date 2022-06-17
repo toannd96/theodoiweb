@@ -29,16 +29,16 @@
 				</tr>
 				{{ range .Sessions }}
 				<tr>
-					<td class="mb-2 mt-1">{{ .Country }}</td>
-					<td class="mb-2 mt-1">{{ .City }}</td>
-					<td class="mb-2 mt-1">{{ .Device }}</td>
-					<td class="mb-2 mt-1">{{ .OS }}</td>
-					<td class="mb-2 mt-1">{{ .Browser }}</td>
-					<td class="mb-2 mt-1">{{ .Version }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.Country }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.City }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.Device }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.OS }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.Browser }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.Version }}</td>
 					<td class="mb-2 mt-1">{{ .Duration }}</td>
-					<td class="mb-2 mt-1">{{ .Created }}</td>
+					<td class="mb-2 mt-1">{{ .MetaData.CreatedAt }}</td>
 					<td>
-						<form action="/session/{{ .ID }}">
+						<form action="/session/{{ .MetaData.ID }}">
 							<button class="btn btn-success btn-sm" title="Xem video phiên truy cập"><i class="fa fa-play"></i></button>
 						</form>
 					</td>
