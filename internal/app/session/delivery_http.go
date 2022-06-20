@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"analytics-api/configs"
-	"analytics-api/internal/pkg/duration"
+	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/geodb"
 	"analytics-api/internal/pkg/log"
 	"analytics-api/internal/pkg/middleware"
@@ -213,10 +213,16 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 		if len(events) != 0 {
 			time1 := events[0].Timestamp / 1000
 			time2 := events[len(events)-1].Timestamp / 1000
-			duration := duration.Duration(time1, time2)
+			duration := dur.Duration(time1, time2)
 
 			session.Duration = duration
-			session.TimeReport = time.Unix(time1, 0).UTC()
+
+			timeReport, err := dur.ParseTime(time.Unix(time1, 0).Format("2006-01-02, 15:04:05"))
+			if err != nil {
+				log.LogError(c, err)
+				return
+			}
+			session.TimeReport = timeReport
 			session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 
 			// save time1 of session id to redis
@@ -227,7 +233,13 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			}
 		} else {
 			session.Duration = "00:00:00"
-			session.TimeReport = time.Now().UTC()
+
+			timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
+			if err != nil {
+				log.LogError(c, err)
+				return
+			}
+			session.TimeReport = timeReport
 			session.MetaData.CreatedAt = time.Now().Format("2006-01-02, 15:04:05")
 		}
 	} else {
@@ -239,9 +251,15 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				return
 			}
 			time2 := events[len(events)-1].Timestamp / 1000
-			duration := duration.Duration(time1, time2)
+			duration := dur.Duration(time1, time2)
 			session.Duration = duration
-			session.TimeReport = time.Now().UTC()
+
+			timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
+			if err != nil {
+				log.LogError(c, err)
+				return
+			}
+			session.TimeReport = timeReport
 			session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 		}
 	}
