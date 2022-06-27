@@ -93,7 +93,7 @@ func (instance *repository) InsertSession(session models.Session, event models.E
 			ID:        session.MetaData.ID,
 			WebsiteID: session.MetaData.WebsiteID,
 			Country:   session.MetaData.Country,
-			City:      session.MetaData.Country,
+			City:      session.MetaData.City,
 			Device:    session.MetaData.Device,
 			OS:        session.MetaData.OS,
 			Browser:   session.MetaData.Browser,
