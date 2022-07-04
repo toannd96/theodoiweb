@@ -11,7 +11,7 @@
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">Records</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                             <li class="breadcrumb-item active">Records</li>
                         </ol>
                         <div class="card mb-4">
@@ -25,6 +25,7 @@
                                 Session Records
                             </div>
                             <div class="card-body">
+                                <div class="table-responsive">
                                 <table class="table table-striped">
                                     <tr>
                                         <th class="header">Country</th>
@@ -49,13 +50,25 @@
                                         <td class="mb-2 mt-1">{{ .MetaData.CreatedAt }}</td>
                                         <td>
                                             <form action="/session/{{ .MetaData.ID }}">
-                                                <button class="btn btn-success btn-sm" title="Xem video phiên truy cập"><i class="fa fa-play"></i></button>
+                                                <button class="btn btn-success btn-sm" title="Watch session record video"><i class="fa-solid fa-play"></i></button>
                                             </form>
                                         </td>
                                     </tr>
                                     {{ end }}
                                 </table>
                             </div>
+                            </div>
+                            <style>
+                                .btn {
+                                    outline-style: initial;
+                                    border-radius: 100px;
+	                                width:30px;
+	                                height:30px;
+	                                padding-top: 5px;
+	                                padding-left: 10px;
+	                                line-height: 15px;
+                                }
+                            </style>
                         </div>
                     </div>
                 </main>
@@ -63,7 +76,6 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
     </body>
 </html>
 

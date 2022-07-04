@@ -122,7 +122,7 @@ func (instance *httpDelivery) GuideTracking(c *gin.Context) {
 	// c.HTML(http.StatusOK, "guide_tracking.html", gin.H{
 	// 	"URL": configs.AppURL,
 	// })
-	c.HTML(http.StatusOK, "tables.html", gin.H{
+	c.HTML(http.StatusOK, "dashboard.html", gin.H{
 		"URL": configs.AppURL,
 	})
 }
