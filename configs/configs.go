@@ -35,9 +35,9 @@ var (
 
 	Redis struct {
 		Client *redis.Client
-		// Host   string
-		// Port   string
-		URL string
+		Host   string
+		Port   string
+		URL    string
 	}
 )
 
@@ -58,9 +58,9 @@ func init() {
 	MongoDB.WebsiteCollection = os.Getenv("WEBSITE_COLLECTION")
 	MongoDB.SessionCollection = os.Getenv("SESSION_COLLECTION")
 
-	// Redis.Host = os.Getenv("REDIS_HOST")
-	// Redis.Port = os.Getenv("REDIS_PORT")
-	Redis.URL = os.Getenv("REDIS_URL")
+	Redis.Host = os.Getenv("REDIS_HOST")
+	Redis.Port = os.Getenv("REDIS_PORT")
+	// Redis.URL = os.Getenv("REDIS_URL")
 
 	Sentry.Dsn = os.Getenv("SENTRY_DSN")
 	sampleRate, err := strconv.ParseFloat(os.Getenv("SENTRY_TRACE_SAMPLE_RATE"), 32)

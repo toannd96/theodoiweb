@@ -32,9 +32,12 @@ type Request struct {
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
-	r.LoadHTMLGlob("web/templates/**")
-	r.StaticFile("/favicon.ico", "./img/favicon.ico")
-	r.StaticFile("/record.js", "./web/static/js/record.js")
+	r.LoadHTMLGlob("web/new_templates/**")
+	// r.StaticFile("/record.js", "./web/static/js/record.js")
+
+	r.Static("/js", "./web/new_static/js")
+	r.Static("/assets", "./web/new_static/assets")
+	r.Static("/css", "./web/new_static/css")
 	r.Use(middleware.CORSMiddleware())
 
 	r.GET("/", instance.GuideTracking)
@@ -116,7 +119,10 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 
 // GuideTracking guide tracking code to website
 func (instance *httpDelivery) GuideTracking(c *gin.Context) {
-	c.HTML(http.StatusOK, "guide_tracking.html", gin.H{
+	// c.HTML(http.StatusOK, "guide_tracking.html", gin.H{
+	// 	"URL": configs.AppURL,
+	// })
+	c.HTML(http.StatusOK, "tables.html", gin.H{
 		"URL": configs.AppURL,
 	})
 }
@@ -150,9 +156,8 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 			log.LogError(c, err)
 			return
 		}
-		c.HTML(http.StatusOK, "list_session_record.html", gin.H{
+		c.HTML(http.StatusOK, "tables.html", gin.H{
 			"Sessions": listSession,
-			"URL":      configs.AppURL,
 		})
 	}
 }
