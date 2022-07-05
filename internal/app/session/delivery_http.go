@@ -33,7 +33,7 @@ type Request struct {
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
 	r.LoadHTMLGlob("web/templates/**")
-	// r.StaticFile("/record.js", "./web/static/js/record.js")
+	r.StaticFile("/record.js", "./web/static/js/record.js")
 
 	r.Static("/js", "./web/static/js")
 	r.Static("/assets", "./web/static/assets")
