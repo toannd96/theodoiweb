@@ -67,15 +67,30 @@ go run main.go
 ├── Procfile
 ├── README.md
 └── web
-    ├── static
+    ├── new_static
+    │   ├── assets
+    │   │   └── img
+    │   │       └── error-404-monochrome.svg
+    │   ├── css
+    │   │   └── styles.css
     │   └── js
-    │       └── record.js
-    └── templates
+    │       ├── record.js
+    │       └── scripts.js
+    └── new_templates
+        ├── 401.html
+        ├── 404.html
+        ├── 500.html
+        ├── dashboard.html
         ├── footer.html
-        ├── guide_tracking.html
         ├── header.html
-        ├── list_session_record.html
-        └── session_replay.html
+        ├── layout_side_nav.html
+        ├── layout_top_nav.html
+        ├── login.html
+        ├── password.html
+        ├── register.html
+        ├── tables.html
+        ├── tracking.html
+        └── video.html
 ```
 
 ## Deploy app to heroku
