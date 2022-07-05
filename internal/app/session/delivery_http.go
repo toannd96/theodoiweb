@@ -40,14 +40,16 @@ func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
 	r.Static("/css", "./web/new_static/css")
 	r.Use(middleware.CORSMiddleware())
 
-	r.GET("/", instance.GuideTracking)
+	r.GET("/", instance.Tracking)
 
 	// Register routes session
 	sessionRoutes := r.Group("session")
-	sessionRoutes.GET("/records", instance.ListSessionRecord)
-	sessionRoutes.POST("/receive", instance.ReceiveSession)
-	sessionRoutes.GET("/:session_id", instance.SessionReplay)
-	sessionRoutes.GET("/event/:session_id", instance.GetEventBySessionID)
+	{
+		sessionRoutes.GET("/records", instance.ListSessionRecord)
+		sessionRoutes.POST("/receive", instance.ReceiveSession)
+		sessionRoutes.GET("/:session_id", instance.SessionReplay)
+		sessionRoutes.GET("/event/:session_id", instance.GetEventBySessionID)
+	}
 }
 
 // GetEventBySessionID streaming all event of session by session id
@@ -117,12 +119,9 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	}
 }
 
-// GuideTracking guide tracking code to website
-func (instance *httpDelivery) GuideTracking(c *gin.Context) {
-	// c.HTML(http.StatusOK, "guide_tracking.html", gin.H{
-	// 	"URL": configs.AppURL,
-	// })
-	c.HTML(http.StatusOK, "dashboard.html", gin.H{
+// Tracking guide tracking code to website
+func (instance *httpDelivery) Tracking(c *gin.Context) {
+	c.HTML(http.StatusOK, "tracking.html", gin.H{
 		"URL": configs.AppURL,
 	})
 }
@@ -136,7 +135,7 @@ func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 		log.LogError(c, err)
 		return
 	}
-	c.HTML(http.StatusOK, "session_replay.html", gin.H{
+	c.HTML(http.StatusOK, "video.html", gin.H{
 		"SessionID": sessionID,
 		"Session":   session.MetaData,
 	})

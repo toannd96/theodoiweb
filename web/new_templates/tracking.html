@@ -1,0 +1,37 @@
+{{ define "tracking.html"}}
+
+{{ template "header.html"}}
+
+    <body class="sb-nav-fixed">
+        {{ template "layout_top_nav.html"}}
+        <div id="layoutSidenav">
+            {{ template "layout_side_nav.html"}}
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">Website</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Website</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <p>Copy and paste the tracking code before the <code>&lt;/head&gt;</code> tag in your site:</p>
+                                <pre>
+&lt;script type=&quot;application/javascript&quot; src=&quot;{{ .URL }}/record.js&quot; &gt;&lt;/script&gt;
+&lt;script type=&quot;application/javascript&quot;&gt;
+    window.recorder.setSession()
+&lt;/script&gt;
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                {{ template "footer.html"}}
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    </body>
+</html>
+
+{{ end }}
