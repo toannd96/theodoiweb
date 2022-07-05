@@ -1,0 +1,82 @@
+{{ define "tables.html"}}
+
+{{ template "header.html"}}
+
+    <body class="sb-nav-fixed">
+        {{ template "layout_top_nav.html"}}
+        <div id="layoutSidenav">
+            {{ template "layout_side_nav.html"}}
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">Records</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Records</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                ...
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Session Records
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th class="header">Country</th>
+                                        <th class="header">City</th>
+                                        <th class="header">Device</th>
+                                        <th class="header">OS</th>
+                                        <th class="header">Browser</th>
+                                        <th class="header">Version</th>
+                                        <th class="header">Duration</th>
+                                        <th class="header">Created</th>
+                                        <th class="header">Video</th>
+                                    </tr>
+                                    {{ range .Sessions }}
+                                    <tr>
+                                        <td class="mb-2 mt-1">{{ .MetaData.Country }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.City }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.Device }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.OS }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.Browser }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.Version }}</td>
+                                        <td class="mb-2 mt-1">{{ .Duration }}</td>
+                                        <td class="mb-2 mt-1">{{ .MetaData.CreatedAt }}</td>
+                                        <td>
+                                            <form action="/session/{{ .MetaData.ID }}">
+                                                <button class="btn btn-success btn-sm" title="Watch session record video"><i class="fa-solid fa-play"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {{ end }}
+                                </table>
+                            </div>
+                            </div>
+                            <style>
+                                .btn-success {
+                                    outline-style: initial;
+                                    border-radius: 100px;
+	                                width:30px;
+	                                height:30px;
+	                                padding-top: 5px;
+	                                padding-left: 10px;
+	                                line-height: 15px;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                </main>
+                {{ template "footer.html"}}
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    </body>
+</html>
+
+{{ end }}

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"analytics-api/configs"
-	"analytics-api/internal/pkg/log"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +18,7 @@ func NewMongo() {
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.LogError(context.TODO(), err)
+		logrus.Error(context.TODO(), err)
 	}
 	configs.MongoDB.Client = client.Database(configs.MongoDB.Name)
 }
