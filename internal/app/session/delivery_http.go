@@ -32,12 +32,12 @@ type Request struct {
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
-	r.LoadHTMLGlob("web/new_templates/**")
+	r.LoadHTMLGlob("web/templates/**")
 	// r.StaticFile("/record.js", "./web/static/js/record.js")
 
-	r.Static("/js", "./web/new_static/js")
-	r.Static("/assets", "./web/new_static/assets")
-	r.Static("/css", "./web/new_static/css")
+	r.Static("/js", "./web/static/js")
+	r.Static("/assets", "./web/static/assets")
+	r.Static("/css", "./web/static/css")
 	r.Use(middleware.CORSMiddleware())
 
 	r.GET("/", instance.Tracking)

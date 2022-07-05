@@ -67,7 +67,7 @@ go run main.go
 ├── Procfile
 ├── README.md
 └── web
-    ├── new_static
+    ├── static
     │   ├── assets
     │   │   └── img
     │   │       └── error-404-monochrome.svg
@@ -76,7 +76,7 @@ go run main.go
     │   └── js
     │       ├── record.js
     │       └── scripts.js
-    └── new_templates
+    └── templates
         ├── 401.html
         ├── 404.html
         ├── 500.html
