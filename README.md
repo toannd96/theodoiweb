@@ -50,10 +50,6 @@ go run main.go
 │       ├── geodb
 │       │   ├── geodb.go
 │       │   └── GeoLite2-City.mmdb
-│       ├── log
-│       │   ├── error.go
-│       │   ├── panic.go
-│       │   └── sentry.go
 │       └── middleware
 │           └── cors.go
 ├── main.go

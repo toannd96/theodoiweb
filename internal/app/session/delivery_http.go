@@ -9,7 +9,6 @@ import (
 	"analytics-api/configs"
 	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/geodb"
-	"analytics-api/internal/pkg/log"
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/models"
 	"analytics-api/pkg"
@@ -63,10 +62,10 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 
 	countSession, err := instance.sessionUseCase.GetCountSession(sessionID)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
-	logrus.Debug("count event ", countSession)
+	logrus.Info("count event ", countSession)
 
 	msgChan := make(chan []*models.Event)
 	breakLineChan := make(chan string)
@@ -74,7 +73,7 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	defer func() {
 		close(msgChan)
 		msgChan = nil
-		logrus.Debug("client connection is closed")
+		logrus.Info("client connection is closed")
 	}()
 
 	go func() {
@@ -82,11 +81,11 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 			for skip <= int(countSession) {
 				events, err := instance.sessionUseCase.GetEventByLimitSkip(sessionID, limit, skip)
 				if err != nil {
-					log.LogError(c, err)
+					logrus.Error(c, err)
 					return
 				}
 				skip = skip + limit
-				logrus.Debug("len events ", len(events))
+				logrus.Info("len events ", len(events))
 				msgChan <- events
 				breakLineChan <- "--break--"
 
@@ -132,7 +131,7 @@ func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 	var session models.Session
 	err := instance.sessionUseCase.GetSession(sessionID, &session)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 	c.HTML(http.StatusOK, "video.html", gin.H{
@@ -146,13 +145,13 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	var session models.Session
 	listSessionID, err := instance.sessionUseCase.GetAllSessionID(session)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 	if len(listSessionID) != 0 {
 		listSession, err := instance.sessionUseCase.GetAllSession(listSessionID, session)
 		if err != nil {
-			log.LogError(c, err)
+			logrus.Error(c, err)
 			return
 		}
 		c.HTML(http.StatusOK, "tables.html", gin.H{
@@ -177,14 +176,14 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 	geoDB, err := geodb.Open(configs.PathGeoDB)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 	defer geoDB.Close()
 
 	geoData, err := geoDB.City(clientIP)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 
@@ -210,7 +209,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 	countSession, err := instance.sessionUseCase.GetCountSession(request.SessionID)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 	if countSession == 0 {
@@ -223,7 +222,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 			timeReport, err := dur.ParseTime(time.Unix(time1, 0).Format("2006-01-02, 15:04:05"))
 			if err != nil {
-				log.LogError(c, err)
+				logrus.Error(c, err)
 				return
 			}
 			session.TimeReport = timeReport
@@ -232,7 +231,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			// save time1 of session id to redis
 			err = instance.sessionUseCase.InsertSessionTimestamp(request.SessionID, time1)
 			if err != nil {
-				log.LogError(c, err)
+				logrus.Error(c, err)
 				return
 			}
 		} else {
@@ -240,7 +239,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 			timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
 			if err != nil {
-				log.LogError(c, err)
+				logrus.Error(c, err)
 				return
 			}
 			session.TimeReport = timeReport
@@ -251,7 +250,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			// get time1 by session id from redis
 			time1, err := instance.sessionUseCase.GetSessionTimestamp(request.SessionID)
 			if err != nil {
-				log.LogError(c, err)
+				logrus.Error(c, err)
 				return
 			}
 			time2 := events[len(events)-1].Timestamp / 1000
@@ -260,7 +259,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 			timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
 			if err != nil {
-				log.LogError(c, err)
+				logrus.Error(c, err)
 				return
 			}
 			session.TimeReport = timeReport
@@ -271,7 +270,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 	// save session
 	err = instance.sessionUseCase.InsertSession(session, events)
 	if err != nil {
-		log.LogError(c, err)
+		logrus.Error(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, session)

@@ -4,9 +4,7 @@ module analytics-api
 go 1.18
 
 require (
-	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-errors/errors v1.4.2
 	github.com/joho/godotenv v1.4.0
 	github.com/mileusna/useragent v1.1.0
 	github.com/oschwald/geoip2-golang v1.7.0
