@@ -9,20 +9,17 @@ require (
 	github.com/mileusna/useragent v1.1.0
 	github.com/oschwald/geoip2-golang v1.7.0
 	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.8.0
 	go.mongodb.org/mongo-driver v1.9.1
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/goccy/go-json v0.9.8 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.19.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
