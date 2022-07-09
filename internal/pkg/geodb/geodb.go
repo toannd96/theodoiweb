@@ -1,7 +1,7 @@
 package geodb
 
 import (
-	"github.com/oschwald/geoip2-golang"
+	geoip2 "github.com/oschwald/geoip2-golang"
 )
 
 func Open(path string) (*geoip2.Reader, error) {

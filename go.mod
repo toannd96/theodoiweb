@@ -18,6 +18,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.19.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
+	github.com/stretchr/testify v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
 )
 
