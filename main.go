@@ -4,6 +4,8 @@ import (
 	"analytics-api/configs"
 	"analytics-api/db"
 	"analytics-api/internal/app/session"
+	"analytics-api/internal/app/user"
+	"analytics-api/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -34,6 +36,19 @@ func initializeRoutes(r *gin.Engine) {
 			"message": "OK",
 		})
 	})
-	delivery := session.NewHTTPDelivery()
-	delivery.InitRoutes(r)
+
+	r.LoadHTMLGlob("web/templates/**")
+	r.StaticFile("/record.js", "./web/static/js/record.js")
+
+	r.Static("/js", "./web/static/js")
+	r.Static("/assets", "./web/static/assets")
+	r.Static("/css", "./web/static/css")
+	r.Use(middleware.CORSMiddleware())
+
+	g := r.Group("/")
+	sessionDelivery := session.NewHTTPDelivery()
+	userDelivery := user.NewHTTPDelivery()
+
+	sessionDelivery.InitRoutes(g)
+	userDelivery.InitRoutes(g)
 }

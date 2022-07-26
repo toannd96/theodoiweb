@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"analytics-api/configs"
+	str "analytics-api/internal/pkg/string"
 	"analytics-api/models"
-	"analytics-api/pkg"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
@@ -81,7 +81,7 @@ func (instance *repository) GetAllSessionID(session models.Session) ([]string, e
 		}
 		listSessionID = append(listSessionID, session.MetaData.ID)
 	}
-	listSessionID = pkg.RemoveDuplicateValues(listSessionID)
+	listSessionID = str.RemoveDuplicateValues(listSessionID)
 	return listSessionID, nil
 }
 

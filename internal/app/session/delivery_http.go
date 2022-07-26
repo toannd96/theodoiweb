@@ -9,9 +9,8 @@ import (
 	"analytics-api/configs"
 	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/geodb"
-	"analytics-api/internal/pkg/middleware"
+	str "analytics-api/internal/pkg/string"
 	"analytics-api/models"
-	"analytics-api/pkg"
 
 	"github.com/gin-gonic/gin"
 	ua "github.com/mileusna/useragent"
@@ -23,27 +22,19 @@ type httpDelivery struct {
 	sessionUseCase UseCase
 }
 
-// Request website tracking send to server
-type Request struct {
+// RequestSession website tracking send to server
+type RequestSession struct {
 	SessionID string         `json:"session_id"`
 	Events    []models.Event `json:"events"`
 }
 
 // InitRoutes ...
-func (instance *httpDelivery) InitRoutes(r *gin.Engine) {
-	r.LoadHTMLGlob("web/templates/**")
-	r.StaticFile("/record.js", "./web/static/js/record.js")
-
-	r.Static("/js", "./web/static/js")
-	r.Static("/assets", "./web/static/assets")
-	r.Static("/css", "./web/static/css")
-	r.Use(middleware.CORSMiddleware())
-
-	r.GET("/", instance.Tracking)
+func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 
 	// Register routes session
 	sessionRoutes := r.Group("session")
 	{
+		sessionRoutes.GET("/tracking", instance.Tracking)
 		sessionRoutes.GET("/records", instance.ListSessionRecord)
 		sessionRoutes.POST("/receive", instance.ReceiveSession)
 		sessionRoutes.GET("/:session_id", instance.SessionReplay)
@@ -162,7 +153,7 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 
 // ReceiveSession receive session from request client
 func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
-	var request Request
+	var request RequestSession
 	var session models.Session
 
 	err := c.ShouldBindJSON(&request)
@@ -203,7 +194,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 	}
 
 	session.MetaData.Country = geoData.Country.Names["en"]
-	session.MetaData.City = pkg.RemoveSubstring(geoData.City.Names["en"], "City")
+	session.MetaData.City = str.RemoveSubstring(geoData.City.Names["en"], "City")
 
 	events := request.Events
 

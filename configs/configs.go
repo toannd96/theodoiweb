@@ -10,9 +10,13 @@ import (
 )
 
 var (
-	Port      string
-	AppURL    string
+	Port   string
+	AppURL string
+
 	PathGeoDB string
+
+	AccessSecretKey  string
+	RefreshSecretKey string
 
 	MongoDB struct {
 		Client            *mongo.Database
@@ -39,6 +43,8 @@ func init() {
 	Port = os.Getenv("PORT")
 	AppURL = os.Getenv("APP_URL")
 	PathGeoDB = os.Getenv("PATH_GEO_DB")
+	AccessSecretKey = os.Getenv("ACCESS_SECRET")
+	RefreshSecretKey = os.Getenv("REFRESH_SECRET")
 
 	MongoDB.URI = os.Getenv("URI")
 	MongoDB.Name = os.Getenv("NAME")
