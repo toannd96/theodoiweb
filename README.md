@@ -47,7 +47,12 @@ go run main.go
 │   │   │   ├── delivery_http.go
 │   │   │   ├── repository.go
 │   │   │   └── usecase.go
-│   │   └── user
+│   │   ├── user
+│   │   │   ├── delivery.go
+│   │   │   ├── delivery_http.go
+│   │   │   ├── repository.go
+│   │   │   └── usecase.go
+│   │   └── website
 │   │       ├── delivery.go
 │   │       ├── delivery_http.go
 │   │       ├── repository.go
@@ -64,6 +69,7 @@ go run main.go
 │       │   └── jwt.go
 │       ├── security
 │       │   ├── access_token.go
+│       │   ├── hash.go
 │       │   ├── password.go
 │       │   ├── password_test.go
 │       │   ├── refresh_token.go
