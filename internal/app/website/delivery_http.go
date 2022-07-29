@@ -43,10 +43,24 @@ func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 
 // Tracking guide tracking code to website
 func (instance *httpDelivery) Tracking(c *gin.Context) {
+	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "extract token metadata failed"})
+		return
+	}
+
+	userID, err := instance.authUsecase.GetAuth(tokenAuth.AccessUUID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "get token auth failed"})
+		return
+	}
+
 	websiteID := c.Param("website_id")
+
 	c.HTML(http.StatusOK, "tracking.html", gin.H{
 		"URL":       configs.AppURL,
 		"WebsiteID": websiteID,
+		"UserID":    userID,
 	})
 }
 
