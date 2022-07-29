@@ -2,8 +2,15 @@ window.recorder = {
 	events: [],
 	rrweb: undefined,
 	runner: undefined,
+	website: {
+		hostName() {
+			let hostName = window.location.hostname.replace('www.','');
+			if (hostName) return JSON.parse(hostName);
+			return hostName;
+		}
+	},
 	session: {
-		genId(length) {
+		genID(length) {
 			const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 			let result = "";
 			const charactersLength = characters.length;
@@ -16,7 +23,7 @@ window.recorder = {
 			let session = window.sessionStorage.getItem('rrweb');
 			if (session) return JSON.parse(session);
 			session = {
-				session_id: window.recorder.session.genId(64),
+				session_id: window.recorder.session.genID(64),
 			};
 			window.sessionStorage.setItem('rrweb', JSON.stringify(session));
 			return session;
@@ -31,7 +38,19 @@ window.recorder = {
 	},
 	setSession: function () {
 		const session = window.recorder.session.get();
-		session.session_id = window.recorder.session.genId(64);
+		session.session_id = window.recorder.session.genID(64);
+		window.recorder.session.receive(session)
+		return window.recorder;
+	},
+	setSite: function(id) {
+		const session = window.recorder.session.get();
+		session.website_id = id;
+		window.recorder.session.receive(session)
+		return window.recorder;
+	},
+	setUser: function(id) {
+		const session = window.recorder.session.get();
+		session.user_id = id;
 		window.recorder.session.receive(session)
 		return window.recorder;
 	},

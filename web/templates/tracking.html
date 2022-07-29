@@ -20,7 +20,7 @@
                                 <pre>
 &lt;script type=&quot;application/javascript&quot; src=&quot;{{ .URL }}/record.js&quot; &gt;&lt;/script&gt;
 &lt;script type=&quot;application/javascript&quot;&gt;
-    window.recorder.setSession()
+    window.recorder.setSession().setSite('{{ .WebsiteID }}').setUser('{{ .UserID }}')
 &lt;/script&gt;
                                 </pre>
                             </div>

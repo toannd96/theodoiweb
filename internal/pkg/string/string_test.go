@@ -58,3 +58,36 @@ func TestRemoveDuplicateValues(t *testing.T) {
 		})
 	}
 }
+
+func TestParseURL(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "test parse url",
+			args: args{
+				input: "https://dactoankmapydev.github.io/",
+			},
+			want:    "dactoankmapydev.github.io",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseURL(tt.args.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseURL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ParseURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

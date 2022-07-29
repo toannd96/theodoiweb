@@ -30,7 +30,8 @@ func NewRepository() Repository {
 
 func (instance *repository) FindUser(email string) (int64, error) {
 	userCollection := configs.MongoDB.Client.Collection(configs.MongoDB.UserCollection)
-	count, err := userCollection.CountDocuments(context.TODO(), bson.M{"email": email})
+	filter := bson.M{"email": email}
+	count, err := userCollection.CountDocuments(context.TODO(), filter)
 	if err != nil {
 		return 0, err
 	}
@@ -48,7 +49,8 @@ func (instance *repository) InsertUser(user models.User) error {
 
 func (instance *repository) GetUserByEmail(email string, user *models.User) error {
 	userCollection := configs.MongoDB.Client.Collection(configs.MongoDB.UserCollection)
-	err := userCollection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&user)
+	filter := bson.M{"email": email}
+	err := userCollection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		return err
 	}
@@ -57,7 +59,8 @@ func (instance *repository) GetUserByEmail(email string, user *models.User) erro
 
 func (instance *repository) GetUserByID(userID string, user *models.User) error {
 	userCollection := configs.MongoDB.Client.Collection(configs.MongoDB.UserCollection)
-	err := userCollection.FindOne(context.TODO(), bson.M{"id": userID}).Decode(&user)
+	filter := bson.M{"id": userID}
+	err := userCollection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		return err
 	}

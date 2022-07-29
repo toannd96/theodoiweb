@@ -24,32 +24,32 @@ type httpDelivery struct {
 var validate = validator.New()
 
 type RequestSignUp struct {
-	Email    string `json:"email,omitempty" validate:"required,email"`
-	FullName string `json:"full_name,omitempty" validate:"required,min=2,max=100"`
-	Password string `json:"password,omitempty" validate:"required,min=8"`
+	Email    string `json:"email" validate:"required,email"`
+	FullName string `json:"full_name" validate:"required,min=2,max=100"`
+	Password string `json:"password" validate:"required,min=8"`
 }
 
 type RequestSignIn struct {
-	Email    string `json:"email,omitempty" validate:"required,email"`
-	Password string `json:"password,omitempty" validate:"required,min=8"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8"`
 }
 
 type RequestUpdateUser struct {
-	FullName string `json:"full_name,omitempty"`
-	Password string `json:"password,omitempty"`
+	FullName string `json:"full_name"`
+	Password string `json:"password"`
 }
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 
-	// Register routes user
-	userRoutes := r.Group("user")
+	r.POST("/signup", instance.SignUp)
+	r.POST("/login", instance.Login)
+	r.POST("/logout", middleware.JWTMiddleware(), instance.Logout)
+
+	profileRoutes := r.Group("profile")
 	{
-		userRoutes.POST("/signup", instance.SignUp)
-		userRoutes.POST("/signin", instance.SignIn)
-		userRoutes.POST("/signout", middleware.JWTMiddleware(), instance.SignOut)
-		userRoutes.GET("/profile", middleware.JWTMiddleware(), instance.GetUser)
-		userRoutes.PUT("/profile/update", middleware.JWTMiddleware(), instance.UpdateUser)
+		profileRoutes.GET("/details", middleware.JWTMiddleware(), instance.GetUser)
+		profileRoutes.PUT("/update", middleware.JWTMiddleware(), instance.UpdateUser)
 	}
 }
 
@@ -112,7 +112,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 	}
 }
 
-func (instance *httpDelivery) SignIn(c *gin.Context) {
+func (instance *httpDelivery) Login(c *gin.Context) {
 	var request RequestSignIn
 	var user models.User
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -162,7 +162,7 @@ func (instance *httpDelivery) SignIn(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (instance *httpDelivery) SignOut(c *gin.Context) {
+func (instance *httpDelivery) Logout(c *gin.Context) {
 	accessToken, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "extract access token failed"})

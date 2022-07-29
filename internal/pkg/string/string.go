@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"net/url"
 	"strings"
 	"unicode"
 )
@@ -25,4 +26,13 @@ func RemoveDuplicateValues(strSlice []string) []string {
 		}
 	}
 	return list
+}
+
+func ParseURL(input string) (string, error) {
+	url, err := url.Parse(input)
+	if err != nil {
+		return "", err
+	}
+	hostname := strings.TrimPrefix(url.Hostname(), "www.")
+	return hostname, nil
 }
