@@ -1,8 +1,7 @@
-package session
+package website
 
 import (
 	"analytics-api/internal/app/auth"
-	"analytics-api/internal/app/website"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,17 +12,18 @@ type HTTPDelivery interface {
 	InitRoutes(r *gin.RouterGroup)
 
 	// Other functions to handle HTTP requests
-	GetEventBySessionID(c *gin.Context)
-	SessionReplay(c *gin.Context)
-	ListSessionRecord(c *gin.Context)
-	ReceiveSession(c *gin.Context)
+	GetWebsite(c *gin.Context)
+	GetAllWebsite(c *gin.Context)
+	Tracking(c *gin.Context)
+	AddWebsite(c *gin.Context)
+	UpdateWebsite(c *gin.Context)
+	DeleteWebsite(c *gin.Context)
 }
 
 // NewHTTPDelivery ...
 func NewHTTPDelivery() HTTPDelivery {
 	return &httpDelivery{
-		sessionUseCase: NewUseCase(),
-		websiteUseCase: website.NewUseCase(),
+		websiteUseCase: NewUseCase(),
 		authUsecase:    auth.NewUseCase(),
 	}
 }

@@ -17,6 +17,7 @@ type Session struct {
 // MetaData ...
 type MetaData struct {
 	ID        string `json:"id" bson:"id"`
+	UserID    string `json:"user_id" bson:"user_id"`
 	WebsiteID string `json:"website_id" bson:"website_id"`
 	Country   string `json:"country" bson:"country"`
 	City      string `json:"city" bson:"city"`
