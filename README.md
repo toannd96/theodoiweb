@@ -69,7 +69,6 @@ go run main.go
 │       │   └── jwt.go
 │       ├── security
 │       │   ├── access_token.go
-│       │   ├── hash.go
 │       │   ├── password.go
 │       │   ├── password_test.go
 │       │   ├── refresh_token.go

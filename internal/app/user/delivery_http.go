@@ -4,6 +4,7 @@ import (
 	"analytics-api/internal/app/auth"
 	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/security"
+	str "analytics-api/internal/pkg/string"
 	"analytics-api/models"
 	"net/http"
 	"time"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -81,11 +81,8 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while hash password"})
 			return
 		}
-		userID, err := uuid.NewUUID()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while create uuid for the user"})
-			return
-		}
+
+		userID := str.GetMD5Hash(request.Email)
 
 		createdAt, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
 		if err != nil {
@@ -94,7 +91,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 		}
 
 		user := models.User{
-			ID:        userID.String(),
+			ID:        userID,
 			FullName:  request.FullName,
 			Email:     request.Email,
 			Password:  hash,
@@ -190,7 +187,7 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 	c.SetCookie("access_token", "", -1, "", "", false, true)
 	c.SetCookie("refresh_token", "", -1, "", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{"msg": "sign out success"})
+	c.JSON(http.StatusOK, gin.H{"msg": "logout success"})
 }
 
 func (instance *httpDelivery) GetUser(c *gin.Context) {
@@ -255,7 +252,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	if request.FullName == "" {
 		user := models.User{
-			ID:        userID,
 			Password:  hash,
 			UpdatedAt: updatedAt,
 		}
@@ -268,7 +264,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	if request.Password == "" {
 		user := models.User{
-			ID:        userID,
 			FullName:  request.FullName,
 			UpdatedAt: updatedAt,
 		}
@@ -281,7 +276,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	if request.FullName != "" && request.Password != "" {
 		user := models.User{
-			ID:        userID,
 			FullName:  request.FullName,
 			Password:  hash,
 			UpdatedAt: updatedAt,

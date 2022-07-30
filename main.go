@@ -16,6 +16,8 @@ func main() {
 	var err error
 
 	db.NewMongo()
+	db.CreateUserCollection()
+	db.CreateWebsiteCollection()
 	db.CreateSessionCollection()
 
 	db.NewRedis()

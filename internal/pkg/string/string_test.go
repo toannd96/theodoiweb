@@ -91,3 +91,29 @@ func TestParseURL(t *testing.T) {
 		})
 	}
 }
+
+func TestGetMD5Hash(t *testing.T) {
+	type args struct {
+		text string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test get md5 hash of string",
+			args: args{
+				text: "localhost",
+			},
+			want: "421aa90e079fa326b6494f812ad13e79",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetMD5Hash(tt.args.text); got != tt.want {
+				t.Errorf("GetMD5Hash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

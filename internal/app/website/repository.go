@@ -17,11 +17,9 @@ type Repository interface {
 	InsertWebsite(userID string, website models.Website) error
 	GetWebsite(userID, websiteID string, website *models.Website) error
 	GetAllWebsite(userID string) (*models.Websites, error)
-	UpdateNameWebsite(userID, websiteID string, website *models.Website) error
-	UpdateURLWebsite(userID, websiteID string, website *models.Website) error
 	UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error
-	UpdateWebsite(userID, websiteID string, website *models.Website) error
 	DeleteWebsite(userID, websiteID string) error
+	DeleteSession(userID, websiteID string) error
 }
 
 type repository struct{}
@@ -62,7 +60,6 @@ func (instance *repository) InsertWebsite(userID string, website models.Website)
 	docs := models.Website{
 		ID:        website.ID,
 		UserID:    userID,
-		Name:      website.Name,
 		HostName:  website.HostName,
 		URL:       website.URL,
 		Tracked:   website.Tracked,
@@ -103,44 +100,6 @@ func (instance *repository) GetAllWebsite(userID string) (*models.Websites, erro
 	return &websites, nil
 }
 
-func (instance *repository) UpdateNameWebsite(userID, websiteID string, website *models.Website) error {
-	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
-	filter := bson.M{"$and": []bson.M{
-		{"user_id": userID},
-		{"id": websiteID},
-	}}
-	update := bson.M{
-		"$set": bson.M{
-			"name":       website.Name,
-			"updated_at": website.UpdatedAt,
-		},
-	}
-	result := websiteCollection.FindOneAndUpdate(context.Background(), filter, update)
-	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
-	}
-	return nil
-}
-
-func (instance *repository) UpdateURLWebsite(userID, websiteID string, website *models.Website) error {
-	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
-	filter := bson.M{"$and": []bson.M{
-		{"user_id": userID},
-		{"id": websiteID},
-	}}
-	update := bson.M{
-		"$set": bson.M{
-			"url":        website.URL,
-			"updated_at": website.UpdatedAt,
-		},
-	}
-	result := websiteCollection.FindOneAndUpdate(context.Background(), filter, update)
-	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
-	}
-	return nil
-}
-
 func (instance *repository) UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error {
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
 	filter := bson.M{"$and": []bson.M{
@@ -160,35 +119,30 @@ func (instance *repository) UpdateTrackedWebsite(userID, websiteID string, websi
 	return nil
 }
 
-func (instance *repository) UpdateWebsite(userID, websiteID string, website *models.Website) error {
-	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
-	filter := bson.M{"$and": []bson.M{
-		{"user_id": userID},
-		{"id": websiteID},
-	}}
-	update := bson.M{
-		"$set": bson.M{
-			"name":       website.Name,
-			"url":        website.URL,
-			"updated_at": website.UpdatedAt,
-		},
-	}
-	result := websiteCollection.FindOneAndUpdate(context.Background(), filter, update)
-	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
-	}
-	return nil
-}
-
 func (instance *repository) DeleteWebsite(userID, websiteID string) error {
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
 	filter := bson.M{"$and": []bson.M{
 		{"user_id": userID},
 		{"id": websiteID},
 	}}
-	_, err := websiteCollection.DeleteOne(context.TODO(), filter)
+	deleteResult, err := websiteCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		return err
 	}
+	logrus.Printf("deleted %v documents in the website collection\n", deleteResult.DeletedCount)
+	return nil
+}
+
+func (instance *repository) DeleteSession(userID, websiteID string) error {
+	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
+	filter := bson.M{"$and": []bson.M{
+		{"meta_data.user_id": userID},
+		{"meta_data.website_id": websiteID},
+	}}
+	deleteResult, err := sessionCollection.DeleteMany(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+	logrus.Printf("deleted %v documents in the session collection\n", deleteResult.DeletedCount)
 	return nil
 }

@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"net/url"
 	"strings"
 	"unicode"
@@ -35,4 +37,9 @@ func ParseURL(input string) (string, error) {
 	}
 	hostname := strings.TrimPrefix(url.Hostname(), "www.")
 	return hostname, nil
+}
+
+func GetMD5Hash(text string) string {
+	binHash := md5.Sum([]byte(text))
+	return hex.EncodeToString(binHash[:])
 }

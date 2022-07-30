@@ -320,7 +320,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, session)
 	} else {
-		logrus.Info("this site id not exists")
+		logrus.Info("this site id not exists ", request.WebsiteID)
 		c.JSON(http.StatusConflict, gin.H{"msg": "this website not exists"})
 		return
 	}

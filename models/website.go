@@ -6,7 +6,6 @@ import "time"
 type Website struct {
 	ID        string    `json:"id" bson:"id"`
 	UserID    string    `json:"user_id" bson:"user_id"`
-	Name      string    `json:"name" bson:"name"`
 	HostName  string    `json:"host_name" bson:"host_name"`
 	URL       string    `json:"url" bson:"url"`
 	Tracked   bool      `json:"tracked" bson:"tracked"`

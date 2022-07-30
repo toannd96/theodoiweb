@@ -36,8 +36,7 @@ func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 		websiteRoutes.GET("/list", middleware.JWTMiddleware(), instance.GetAllWebsite)
 		websiteRoutes.GET("/tracking/:website_id", middleware.JWTMiddleware(), instance.Tracking)
 		websiteRoutes.POST("/add", middleware.JWTMiddleware(), instance.AddWebsite)
-		websiteRoutes.PUT("/update", middleware.JWTMiddleware(), instance.UpdateWebsite)
-		websiteRoutes.DELETE("/delete", middleware.JWTMiddleware(), instance.DeleteWebsite)
+		websiteRoutes.DELETE("/delete/:website_id", middleware.JWTMiddleware(), instance.DeleteWebsite)
 	}
 }
 
@@ -59,8 +58,8 @@ func (instance *httpDelivery) Tracking(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "tracking.html", gin.H{
 		"URL":       configs.AppURL,
-		"WebsiteID": websiteID,
 		"UserID":    userID,
+		"WebsiteID": websiteID,
 	})
 }
 
@@ -152,7 +151,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 		return
 	} else {
 
-		websiteID := security.Hash(hostName)
+		websiteID := str.GetMD5Hash(hostName)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while create id for the website"})
 			return
@@ -167,7 +166,6 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 		website := models.Website{
 			ID:        websiteID,
 			UserID:    userID,
-			Name:      request.Name,
 			HostName:  hostName,
 			URL:       request.URL,
 			Tracked:   false,
@@ -185,8 +183,31 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 	}
 }
 
-func (instance *httpDelivery) UpdateWebsite(c *gin.Context) {
-}
-
 func (instance *httpDelivery) DeleteWebsite(c *gin.Context) {
+	websiteID := c.Param("website_id")
+	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "extract token metadata failed"})
+		return
+	}
+
+	userID, err := instance.authUsecase.GetAuth(tokenAuth.AccessUUID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "get token auth failed"})
+		return
+	}
+
+	deleteWebsiteErr := instance.websiteUseCase.DeleteWebsite(userID, websiteID)
+	if deleteWebsiteErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the website by id"})
+		return
+	}
+
+	deleteSessionErr := instance.websiteUseCase.DeleteSession(userID, websiteID)
+	if deleteSessionErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the website by id"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"msg": "delete website success"})
 }

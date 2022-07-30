@@ -16,7 +16,6 @@ type HTTPDelivery interface {
 	GetAllWebsite(c *gin.Context)
 	Tracking(c *gin.Context)
 	AddWebsite(c *gin.Context)
-	UpdateWebsite(c *gin.Context)
 	DeleteWebsite(c *gin.Context)
 }
 

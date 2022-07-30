@@ -44,6 +44,79 @@ func CreateSessionCollection() error {
 		if err != nil {
 			return err
 		}
+
+		// created index
+		models := []mongo.IndexModel{
+			{
+				Keys: bson.M{"meta_data.user_id": 1},
+			},
+			{
+				Keys: bson.M{"meta_data.id": 1},
+			},
+			{
+				Keys: bson.M{"meta_data.website_id": 1},
+			},
+		}
+
+		collection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
+		_, CreateIndexErr := collection.Indexes().CreateMany(context.Background(), models)
+		if CreateIndexErr != nil {
+			return err
+		}
+	} else {
+		logrus.Debug("collection exists")
+	}
+	return nil
+}
+
+func CreateUserCollection() error {
+	exists, err := checkCollection(configs.MongoDB.UserCollection)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		logrus.Info("not exists, create collection name ", configs.MongoDB.UserCollection)
+		models := []mongo.IndexModel{
+			{
+				Keys: bson.M{"id": 1},
+			},
+			{
+				Keys: bson.M{"email": 1},
+			},
+		}
+
+		collection := configs.MongoDB.Client.Collection(configs.MongoDB.UserCollection)
+		_, err := collection.Indexes().CreateMany(context.Background(), models)
+		if err != nil {
+			return err
+		}
+	} else {
+		logrus.Debug("collection exists")
+	}
+	return nil
+}
+
+func CreateWebsiteCollection() error {
+	exists, err := checkCollection(configs.MongoDB.WebsiteCollection)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		logrus.Info("not exists, create collection name ", configs.MongoDB.WebsiteCollection)
+		models := []mongo.IndexModel{
+			{
+				Keys: bson.M{"user_id": 1},
+			},
+			{
+				Keys: bson.M{"id": 1},
+			},
+		}
+
+		collection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
+		_, err := collection.Indexes().CreateMany(context.Background(), models)
+		if err != nil {
+			return err
+		}
 	} else {
 		logrus.Debug("collection exists")
 	}

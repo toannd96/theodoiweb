@@ -11,11 +11,9 @@ type UseCase interface {
 	InsertWebsite(userID string, website models.Website) error
 	GetWebsite(userID, websiteID string, website *models.Website) error
 	GetAllWebsite(userID string) (*models.Websites, error)
-	UpdateNameWebsite(userID, websiteID string, website *models.Website) error
-	UpdateURLWebsite(userID, websiteID string, website *models.Website) error
 	UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error
-	UpdateWebsite(userID, websiteID string, website *models.Website) error
 	DeleteWebsite(userID, websiteID string) error
+	DeleteSession(userID, websiteID string) error
 }
 
 type useCase struct {
@@ -69,22 +67,6 @@ func (instance *useCase) GetAllWebsite(userID string) (*models.Websites, error) 
 	return websites, nil
 }
 
-func (instance *useCase) UpdateNameWebsite(userID, websiteID string, website *models.Website) error {
-	err := instance.repo.UpdateNameWebsite(userID, websiteID, website)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (instance *useCase) UpdateURLWebsite(userID, websiteID string, website *models.Website) error {
-	err := instance.repo.UpdateURLWebsite(userID, websiteID, website)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (instance *useCase) UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error {
 	err := instance.repo.UpdateTrackedWebsite(userID, websiteID, website)
 	if err != nil {
@@ -93,16 +75,16 @@ func (instance *useCase) UpdateTrackedWebsite(userID, websiteID string, website 
 	return nil
 }
 
-func (instance *useCase) UpdateWebsite(userID, websiteID string, website *models.Website) error {
-	err := instance.repo.UpdateWebsite(userID, websiteID, website)
+func (instance *useCase) DeleteWebsite(userID, websiteID string) error {
+	err := instance.repo.DeleteWebsite(userID, websiteID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) DeleteWebsite(userID, websiteID string) error {
-	err := instance.repo.DeleteWebsite(userID, websiteID)
+func (instance *useCase) DeleteSession(userID, websiteID string) error {
+	err := instance.repo.DeleteSession(userID, websiteID)
 	if err != nil {
 		return err
 	}
