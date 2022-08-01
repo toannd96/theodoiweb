@@ -2,7 +2,6 @@ package user
 
 import (
 	"analytics-api/internal/app/auth"
-	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/security"
 	str "analytics-api/internal/pkg/string"
 	"analytics-api/models"
@@ -12,7 +11,6 @@ import (
 	"analytics-api/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +19,7 @@ type httpDelivery struct {
 	authUsecase auth.UseCase
 }
 
-var validate = validator.New()
+// var validate = validator.New()
 
 type RequestSignUp struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -42,31 +40,41 @@ type RequestUpdateUser struct {
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 
+	r.GET("/signup", instance.ShowSignupPage)
 	r.POST("/signup", instance.SignUp)
+
+	r.GET("/login", instance.ShowLoginPage)
 	r.POST("/login", instance.Login)
-	r.POST("/logout", middleware.JWTMiddleware(), instance.Logout)
+
+	r.GET("/logout", middleware.JWTMiddleware(), instance.Logout)
 
 	profileRoutes := r.Group("profile")
 	{
 		profileRoutes.GET("/details", middleware.JWTMiddleware(), instance.GetUser)
-		profileRoutes.PUT("/update", middleware.JWTMiddleware(), instance.UpdateUser)
+
+		// profileRoutes.GET("/update", middleware.JWTMiddleware(), instance.ShowDetailsUserPage)
+		profileRoutes.POST("/update", middleware.JWTMiddleware(), instance.UpdateUser)
 	}
 }
 
+func (instance *httpDelivery) ShowDetailsUserPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "profile.html", gin.H{})
+}
+
+func (instance *httpDelivery) ShowSignupPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "register.html", gin.H{})
+}
+
 func (instance *httpDelivery) SignUp(c *gin.Context) {
-	var request RequestSignUp
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err})
-		return
-	}
+	email := c.PostForm("email")
+	fullname := c.PostForm("fullname")
+	password := c.PostForm("password")
 
-	validationErr := validate.Struct(request)
-	if validationErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": validationErr.Error()})
-		return
-	}
+	logrus.Info("email", email)
+	logrus.Info("fullname", fullname)
+	logrus.Info("password", password)
 
-	count, err := instance.userUseCase.FindUser(request.Email)
+	count, err := instance.userUseCase.FindUser(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while check for the email"})
 		return
@@ -76,24 +84,20 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"msg": "this email already exists"})
 		return
 	} else {
-		hash, err := security.HashPassword(request.Password)
+		hash, err := security.HashPassword(password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while hash password"})
 			return
 		}
 
-		userID := str.GetMD5Hash(request.Email)
+		userID := str.GetMD5Hash(email)
 
-		createdAt, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
-		if err != nil {
-			logrus.Error(c, err)
-			return
-		}
+		createdAt := time.Now().Format("2006-01-02, 15:04:05")
 
 		user := models.User{
 			ID:        userID,
-			FullName:  request.FullName,
-			Email:     request.Email,
+			FullName:  fullname,
+			Email:     email,
 			Password:  hash,
 			CreatedAt: createdAt,
 			UpdatedAt: createdAt,
@@ -105,32 +109,31 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, user)
+		c.Redirect(http.StatusMovedPermanently, "/login")
 	}
 }
 
+func (instance *httpDelivery) ShowLoginPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", gin.H{})
+}
+
 func (instance *httpDelivery) Login(c *gin.Context) {
-	var request RequestSignIn
 	var user models.User
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
-		return
-	}
 
-	validationErr := validate.Struct(request)
-	if validationErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": validationErr.Error()})
-		return
-	}
+	email := c.PostForm("email")
+	password := c.PostForm("password")
 
-	err := instance.userUseCase.GetUserByEmail(request.Email, &user)
+	logrus.Info("email", email)
+	logrus.Info("password", password)
+
+	err := instance.userUseCase.GetUserByEmail(email, &user)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"msg": "email not exists"})
 		return
 	}
 
 	// check password
-	isTheSame := security.DoPasswordsMatch(user.Password, request.Password)
+	isTheSame := security.DoPasswordsMatch(user.Password, password)
 	if !isTheSame {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "passowrd is incorrect"})
 		return
@@ -156,7 +159,8 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	c.SetCookie("access_token", token.AccessToken, 900, "/", "localhost", false, true)
 	c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
 
-	c.JSON(http.StatusOK, user)
+	// c.JSON(http.StatusOK, user)
+	c.Redirect(http.StatusMovedPermanently, "/website/dashboard")
 }
 
 func (instance *httpDelivery) Logout(c *gin.Context) {
@@ -166,6 +170,7 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 		return
 	}
 
+	logrus.Info("delete access token")
 	delAtErr := instance.authUsecase.DeleteAccessToken(accessToken.AccessUUID)
 	if delAtErr != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "error occured while del access token"})
@@ -178,16 +183,21 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 		return
 	}
 
+	logrus.Info("delete refresh token")
 	delRtErr := instance.authUsecase.DeleteRefreshToken(refreshToken.RefreshUUID)
 	if delRtErr != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "error occured while del refresh token"})
 		return
 	}
 
+	logrus.Info("delete access from cookie token")
 	c.SetCookie("access_token", "", -1, "", "", false, true)
+
+	logrus.Info("delete refresh from cookie token")
 	c.SetCookie("refresh_token", "", -1, "", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{"msg": "logout success"})
+	c.JSON(http.StatusOK, gin.H{})
+	c.Redirect(http.StatusMovedPermanently, "/login")
 }
 
 func (instance *httpDelivery) GetUser(c *gin.Context) {
@@ -204,27 +214,29 @@ func (instance *httpDelivery) GetUser(c *gin.Context) {
 		return
 	}
 
+	logrus.Info(userID)
+
 	getUserErr := instance.userUseCase.GetUserByID(userID, &user)
 	if getUserErr != nil {
+		logrus.Error(getUserErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	logrus.Info(user)
+
+	c.HTML(http.StatusOK, "profile.html", gin.H{
+		"User": user,
+	})
 }
 
 func (instance *httpDelivery) UpdateUser(c *gin.Context) {
-	var request RequestUpdateUser
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	fullName := c.PostForm("fullname")
+	password := c.PostForm("password")
+	confirmPassword := c.PostForm("confirmPassword")
 
-	validationErr := validate.Struct(request)
-	if validationErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-		return
-	}
+	logrus.Info("fullname", fullName)
+	logrus.Info("password", password)
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
@@ -238,33 +250,34 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	hash, err := security.HashPassword(request.Password)
+	hash, err := security.HashPassword(password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while hash password"})
 		return
 	}
 
-	updatedAt, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
-	if err != nil {
-		logrus.Error(c, err)
-		return
+	updatedAt := time.Now().Format("2006-01-02, 15:04:05")
+
+	if fullName == "" {
+		if password == confirmPassword {
+			user := models.User{
+				Password:  hash,
+				UpdatedAt: updatedAt,
+			}
+			err := instance.userUseCase.UpdatePassword(userID, &user)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user password"})
+				return
+			}
+		} else {
+			c.Redirect(http.StatusMovedPermanently, "/profile/details")
+		}
+
 	}
 
-	if request.FullName == "" {
+	if password == "" {
 		user := models.User{
-			Password:  hash,
-			UpdatedAt: updatedAt,
-		}
-		err := instance.userUseCase.UpdatePassword(userID, &user)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user password"})
-			return
-		}
-	}
-
-	if request.Password == "" {
-		user := models.User{
-			FullName:  request.FullName,
+			FullName:  fullName,
 			UpdatedAt: updatedAt,
 		}
 		err := instance.userUseCase.UpdateFullName(userID, &user)
@@ -274,18 +287,23 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 		}
 	}
 
-	if request.FullName != "" && request.Password != "" {
-		user := models.User{
-			FullName:  request.FullName,
-			Password:  hash,
-			UpdatedAt: updatedAt,
-		}
-		updateUserErr := instance.userUseCase.UpdateUser(userID, &user)
-		if updateUserErr != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user"})
-			return
+	if fullName != "" && password != "" {
+		if password == confirmPassword {
+			user := models.User{
+				FullName:  fullName,
+				Password:  hash,
+				UpdatedAt: updatedAt,
+			}
+			updateUserErr := instance.userUseCase.UpdateUser(userID, &user)
+			if updateUserErr != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user"})
+				return
+			}
+		} else {
+			c.Redirect(http.StatusMovedPermanently, "/profile/details")
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "update user success"})
+	// c.JSON(http.StatusOK, gin.H{"msg": "update user success"})
+	c.Redirect(http.StatusMovedPermanently, "/profile/details")
 }

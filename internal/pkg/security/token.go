@@ -20,7 +20,7 @@ type TokenDetails struct {
 
 func CreateToken(userID string) (*TokenDetails, error) {
 	td := &TokenDetails{
-		AtExpires:   time.Now().Add(time.Minute * 15).Unix(),
+		AtExpires:   time.Now().Add(time.Minute * 60).Unix(),
 		AccessUUID:  uuid.NewV4().String(),
 		RtExpires:   time.Now().Add(time.Hour * 24).Unix(),
 		RefreshUUID: uuid.NewV4().String(),

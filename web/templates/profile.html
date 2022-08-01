@@ -1,0 +1,103 @@
+{{ define "profile.html" }}
+
+{{ template "header.html"}}
+
+    <body class="sb-nav-fixed">
+        {{ template "layout_top_nav.html"}}
+        <div id="layoutSidenav">
+            {{ template "layout_side_nav.html"}}                
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">Profile</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Profile</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-body">
+
+                                <form action="/profile/update" method="post">
+                                <div class="row">
+                                
+                                    <div class="col-md-6">
+
+                                        <div class="col-mb-6">
+                                            <h6 class="mb-2 text-primary">Personal Details</h6>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group mb-3">
+                                                <label for="fullName">Full Name</label>
+                                                <input type="text" class="form-control" placeholder="Enter your full name" name="fullname" value="{{ .User.FullName }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group">
+                                                <label for="email">Email Address</label>
+                                                <input type="text" class="form-control" name="email" value="{{ .User.Email }}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <div class="col-mb-6">
+                                            <h6 class="mb-2 text-primary">Security Details</h6>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group mb-3">
+                                                <label for="password">New Password</label>
+                                                <input type="text" class="form-control" placeholder="Enter your new password" name="password">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group mb-3">
+                                                <label for="password">Confirm Password</label>
+                                                <input type="text" class="form-control" placeholder="Confirm your new password" name="confirmPassword">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <div class="col-mb-6">
+                                            <h6 class="mb-2 text-primary">Time Details</h6>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group mb-3">
+                                                <label for="created">Created Time</label>
+                                                <input type="text" class="form-control" name="created" value="{{ .User.CreatedAt }}" readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-mb-6">
+                                            <div class="form-group mb-3">
+                                                <label for="updated">Updated Time</label>
+                                                <input type="text" class="form-control" name="updated" value="{{ .User.UpdatedAt }}" readonly>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-mb-6">
+                                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i> Update Profile</button>
+                                    </div>
+
+                                </div>
+                            </form>
+                            </div>
+                </main>
+                {{ template "footer.html"}}
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    </body>
+</html>
+
+{{ end }}

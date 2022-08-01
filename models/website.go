@@ -1,16 +1,14 @@
 package models
 
-import "time"
-
 // Website ...
 type Website struct {
-	ID        string    `json:"id" bson:"id"`
-	UserID    string    `json:"user_id" bson:"user_id"`
-	HostName  string    `json:"host_name" bson:"host_name"`
-	URL       string    `json:"url" bson:"url"`
-	Tracked   bool      `json:"tracked" bson:"tracked"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	ID        string `json:"id" bson:"id"`
+	UserID    string `json:"user_id" bson:"user_id"`
+	Name      string `json:"name" bson:"name"`
+	HostName  string `json:"host_name" bson:"host_name"`
+	URL       string `json:"url" bson:"url"`
+	CreatedAt string `json:"created_at" bson:"created_at"`
+	UpdatedAt string `json:"updated_at" bson:"updated_at"`
 }
 
 // Websites ...

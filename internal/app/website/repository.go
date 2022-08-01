@@ -17,7 +17,7 @@ type Repository interface {
 	InsertWebsite(userID string, website models.Website) error
 	GetWebsite(userID, websiteID string, website *models.Website) error
 	GetAllWebsite(userID string) (*models.Websites, error)
-	UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error
+	UpdateNameWebsite(userID, websiteID string, website *models.Website) error
 	DeleteWebsite(userID, websiteID string) error
 	DeleteSession(userID, websiteID string) error
 }
@@ -60,9 +60,9 @@ func (instance *repository) InsertWebsite(userID string, website models.Website)
 	docs := models.Website{
 		ID:        website.ID,
 		UserID:    userID,
+		Name:      website.Name,
 		HostName:  website.HostName,
 		URL:       website.URL,
-		Tracked:   website.Tracked,
 		CreatedAt: website.CreatedAt,
 		UpdatedAt: website.UpdatedAt,
 	}
@@ -100,7 +100,7 @@ func (instance *repository) GetAllWebsite(userID string) (*models.Websites, erro
 	return &websites, nil
 }
 
-func (instance *repository) UpdateTrackedWebsite(userID, websiteID string, website *models.Website) error {
+func (instance *repository) UpdateNameWebsite(userID, websiteID string, website *models.Website) error {
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
 	filter := bson.M{"$and": []bson.M{
 		{"user_id": userID},
@@ -108,7 +108,7 @@ func (instance *repository) UpdateTrackedWebsite(userID, websiteID string, websi
 	}}
 	update := bson.M{
 		"$set": bson.M{
-			"tracked":    website.Tracked,
+			"name":       website.Name,
 			"updated_at": website.UpdatedAt,
 		},
 	}

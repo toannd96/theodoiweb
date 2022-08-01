@@ -3,7 +3,6 @@ package website
 import (
 	"analytics-api/configs"
 	"analytics-api/internal/app/auth"
-	dur "analytics-api/internal/pkg/duration"
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/internal/pkg/security"
 	str "analytics-api/internal/pkg/string"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +19,7 @@ type httpDelivery struct {
 	authUsecase    auth.UseCase
 }
 
-var validate = validator.New()
+// var validate = validator.New()
 
 type RequestWebsite struct {
 	Name string `json:"name" validate:"required,min=2,max=100"`
@@ -32,16 +30,30 @@ type RequestWebsite struct {
 func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 	websiteRoutes := r.Group("/website")
 	{
+		websiteRoutes.GET("/dashboard", middleware.JWTMiddleware(), instance.Dashboard)
 		websiteRoutes.GET("/:website_id", middleware.JWTMiddleware(), instance.GetWebsite)
 		websiteRoutes.GET("/list", middleware.JWTMiddleware(), instance.GetAllWebsite)
 		websiteRoutes.GET("/tracking/:website_id", middleware.JWTMiddleware(), instance.Tracking)
+
+		websiteRoutes.GET("/add", middleware.JWTMiddleware(), instance.ShowAddWebsite)
 		websiteRoutes.POST("/add", middleware.JWTMiddleware(), instance.AddWebsite)
-		websiteRoutes.DELETE("/delete/:website_id", middleware.JWTMiddleware(), instance.DeleteWebsite)
+
+		websiteRoutes.GET("/delete/:website_id", middleware.JWTMiddleware(), instance.DeleteWebsite)
 	}
+}
+
+func (instance *httpDelivery) Dashboard(c *gin.Context) {
+	c.HTML(http.StatusOK, "dashboard.html", gin.H{})
+}
+
+func (instance *httpDelivery) ShowAddWebsite(c *gin.Context) {
+	c.HTML(http.StatusOK, "website.html", gin.H{})
 }
 
 // Tracking guide tracking code to website
 func (instance *httpDelivery) Tracking(c *gin.Context) {
+	websiteID := c.Param("website_id")
+
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "extract token metadata failed"})
@@ -53,8 +65,6 @@ func (instance *httpDelivery) Tracking(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "get token auth failed"})
 		return
 	}
-
-	websiteID := c.Param("website_id")
 
 	c.HTML(http.StatusOK, "tracking.html", gin.H{
 		"URL":       configs.AppURL,
@@ -106,23 +116,21 @@ func (instance *httpDelivery) GetAllWebsite(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, websites)
+	logrus.Info("len list website ", len(*websites))
+	if len(*websites) == 0 {
+		c.HTML(http.StatusOK, "website.html", gin.H{})
+	}
+
+	c.HTML(http.StatusOK, "websites.html", gin.H{
+		"Websites": websites,
+	})
 }
 
 func (instance *httpDelivery) AddWebsite(c *gin.Context) {
-	var request RequestWebsite
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	name := c.PostForm("name")
+	url := c.PostForm("url")
 
-	validationErr := validate.Struct(request)
-	if validationErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-		return
-	}
-
-	hostName, err := str.ParseURL(request.URL)
+	hostName, err := str.ParseURL(url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while parse url the website"})
 		return
@@ -157,18 +165,14 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 			return
 		}
 
-		createdAt, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
-		if err != nil {
-			logrus.Error(c, err)
-			return
-		}
+		createdAt := time.Now().Format("2006-01-02, 15:04:05")
 
 		website := models.Website{
 			ID:        websiteID,
 			UserID:    userID,
+			Name:      name,
 			HostName:  hostName,
-			URL:       request.URL,
-			Tracked:   false,
+			URL:       url,
 			CreatedAt: createdAt,
 			UpdatedAt: createdAt,
 		}
@@ -179,7 +183,8 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, website)
+		// c.JSON(http.StatusOK, website)
+		c.Redirect(http.StatusMovedPermanently, "/website/list")
 	}
 }
 
@@ -209,5 +214,6 @@ func (instance *httpDelivery) DeleteWebsite(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "delete website success"})
+	// c.JSON(http.StatusOK, gin.H{"msg": "delete website success"})
+	c.Redirect(http.StatusMovedPermanently, "/website/list")
 }

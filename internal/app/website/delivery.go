@@ -12,6 +12,8 @@ type HTTPDelivery interface {
 	InitRoutes(r *gin.RouterGroup)
 
 	// Other functions to handle HTTP requests
+	Dashboard(c *gin.Context)
+	ShowAddWebsite(c *gin.Context)
 	GetWebsite(c *gin.Context)
 	GetAllWebsite(c *gin.Context)
 	Tracking(c *gin.Context)
