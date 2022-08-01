@@ -21,10 +21,10 @@ type httpDelivery struct {
 
 // var validate = validator.New()
 
-type RequestWebsite struct {
-	Name string `json:"name" validate:"required,min=2,max=100"`
-	URL  string `json:"url" validate:"required,min=3"`
-}
+// type RequestWebsite struct {
+// 	Name string `json:"name" validate:"required,min=2,max=100"`
+// 	URL  string `json:"url" validate:"required,min=3"`
+// }
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {

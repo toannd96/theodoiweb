@@ -21,21 +21,21 @@ type httpDelivery struct {
 
 // var validate = validator.New()
 
-type RequestSignUp struct {
-	Email    string `json:"email" validate:"required,email"`
-	FullName string `json:"full_name" validate:"required,min=2,max=100"`
-	Password string `json:"password" validate:"required,min=8"`
-}
+// type RequestSignUp struct {
+// 	Email    string `json:"email" validate:"required,email"`
+// 	FullName string `json:"full_name" validate:"required,min=2,max=100"`
+// 	Password string `json:"password" validate:"required,min=8"`
+// }
 
-type RequestSignIn struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
-}
+// type RequestSignIn struct {
+// 	Email    string `json:"email" validate:"required,email"`
+// 	Password string `json:"password" validate:"required,min=8"`
+// }
 
-type RequestUpdateUser struct {
-	FullName string `json:"full_name"`
-	Password string `json:"password"`
-}
+// type RequestUpdateUser struct {
+// 	FullName string `json:"full_name"`
+// 	Password string `json:"password"`
+// }
 
 // InitRoutes ...
 func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
@@ -66,6 +66,18 @@ func (instance *httpDelivery) ShowSignupPage(c *gin.Context) {
 }
 
 func (instance *httpDelivery) SignUp(c *gin.Context) {
+	// var request RequestSignUp
+	// if err := c.ShouldBindJSON(&request); err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"msg": err})
+	// 	return
+	// }
+
+	// validationErr := validate.Struct(request)
+	// if validationErr != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"msg": validationErr.Error()})
+	// 	return
+	// }
+
 	email := c.PostForm("email")
 	fullname := c.PostForm("fullname")
 	password := c.PostForm("password")
@@ -119,6 +131,17 @@ func (instance *httpDelivery) ShowLoginPage(c *gin.Context) {
 
 func (instance *httpDelivery) Login(c *gin.Context) {
 	var user models.User
+	// var request RequestSignIn
+	// if err := c.ShouldBindJSON(&request); err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+	// 	return
+	// }
+
+	// validationErr := validate.Struct(request)
+	// if validationErr != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"msg": validationErr.Error()})
+	// 	return
+	// }
 
 	email := c.PostForm("email")
 	password := c.PostForm("password")

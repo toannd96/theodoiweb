@@ -104,10 +104,13 @@ go run main.go
         ├── layout_top_nav.html
         ├── login.html
         ├── password.html
+        ├── profile.html
         ├── register.html
         ├── tables.html
         ├── tracking.html
-        └── video.html
+        ├── video.html
+        ├── website.html
+        └── websites.html
 ```
 
 ## Deploy app to heroku
