@@ -127,8 +127,8 @@ func (instance *httpDelivery) GetAllWebsite(c *gin.Context) {
 }
 
 func (instance *httpDelivery) AddWebsite(c *gin.Context) {
-	name := c.PostForm("name")
 	url := c.PostForm("url")
+	category := c.PostForm("category")
 
 	hostName, err := str.ParseURL(url)
 	if err != nil {
@@ -170,7 +170,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 		website := models.Website{
 			ID:        websiteID,
 			UserID:    userID,
-			Name:      name,
+			Category:  category,
 			HostName:  hostName,
 			URL:       url,
 			CreatedAt: createdAt,

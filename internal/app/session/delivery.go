@@ -15,6 +15,8 @@ type HTTPDelivery interface {
 	// Other functions to handle HTTP requests
 	GetEventBySessionID(c *gin.Context)
 	SessionReplay(c *gin.Context)
+
+	ListWebsiteOfSessionRecord(c *gin.Context)
 	ListSessionRecord(c *gin.Context)
 	ReceiveSession(c *gin.Context)
 }

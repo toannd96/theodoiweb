@@ -9,7 +9,7 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Website</h1>
+                        <h1 class="mt-4">Setting</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
                             <li class="breadcrumb-item active"><a href="/website/list">Website</a></li>
@@ -26,21 +26,49 @@
                                     
                                     <div class="row mb-3">
 
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="name">Name</label>
-                                                <input type="text" class="form-control" placeholder="Enter your name website" name="name" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
+                                        <!-- <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="url">URL</label>
                                                 <input type="text" class="form-control" placeholder="Enter your url website" name="url" required>
                                             </div>
                                         </div>
 
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="type">Type</label>
+                                                <input type="text" class="form-control" placeholder="Enter your type website" name="type" required>
+                                            </div>
+                                        </div> -->
+
+                                        <div class="col-md">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" placeholder="Enter your url website" name="url" required>
+                                                <label>Enter your url website</label>
+                                            </div>
+                                        </div>
+  
+                                        <div class="col-md">
+                                            <div class="form-floating">
+                                                <select name="category" type="text" class="form-select">
+                                                    <option selected>Please select...</option>
+                                                    <option>E-commerce</option>
+                                                    <option>Marketplace</option>
+                                                    <option>Consulting</option>
+                                                    <option>Media</option>
+                                                    <option>Blog or Personal</option>
+                                                    <option>Education</option>
+                                                    <option>Community</option>
+                                                    <option>Other</option>
+                                                </select>
+                                                <label>Choose a category...</label>
+                                            </div>
+                                        </div>
+
+                                        
+
                                     </div>
+
+                                    
 
                                     <div class="col-mb-6">
                                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Website</button>

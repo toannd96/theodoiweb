@@ -9,7 +9,7 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Profile</h1>
+                        <h1 class="mt-4">Setting</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
                             <li class="breadcrumb-item active">Profile</li>
@@ -26,19 +26,27 @@
                                             <h6 class="mb-2 text-primary">Personal Details</h6>
                                         </div>
 
-                                        <div class="col-mb-6">
+                                        <!-- <div class="col-mb-6">
                                             <div class="form-group mb-3">
                                                 <label for="fullName">Full Name</label>
                                                 <input type="text" class="form-control" placeholder="Enter your full name" name="fullname" value="{{ .User.FullName }}">
                                             </div>
+                                        </div> -->
+
+                                        <div class="col-mb-6">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" placeholder="Enter your full name" name="fullname" value="{{ .User.FullName }}">
+                                                <label>Full name</label>
+                                            </div>
                                         </div>
 
                                         <div class="col-mb-6">
-                                            <div class="form-group">
-                                                <label for="email">Email Address</label>
+                                            <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" name="email" value="{{ .User.Email }}" readonly>
+                                                <label>Email address</label>
                                             </div>
                                         </div>
+
                                     </div>
 
                                     <div class="col-md-6">
@@ -48,16 +56,16 @@
                                         </div>
 
                                         <div class="col-mb-6">
-                                            <div class="form-group mb-3">
-                                                <label for="password">New Password</label>
+                                            <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" placeholder="Enter your new password" name="password">
+                                                <label for="password">New password</label>
                                             </div>
                                         </div>
 
                                         <div class="col-mb-6">
-                                            <div class="form-group mb-3">
-                                                <label for="password">Confirm Password</label>
+                                            <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" placeholder="Confirm your new password" name="confirmPassword">
+                                                <label for="password">Confirm password</label>
                                             </div>
                                         </div>
 
@@ -70,16 +78,16 @@
                                         </div>
 
                                         <div class="col-mb-6">
-                                            <div class="form-group mb-3">
-                                                <label for="created">Created Time</label>
+                                            <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" name="created" value="{{ .User.CreatedAt }}" readonly>
+                                                <label for="created">Created time</label>
                                             </div>
                                         </div>
 
                                         <div class="col-mb-6">
-                                            <div class="form-group mb-3">
-                                                <label for="updated">Updated Time</label>
+                                            <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" name="updated" value="{{ .User.UpdatedAt }}" readonly>
+                                                <label for="updated">Updated time</label>
                                             </div>
                                         </div>
 

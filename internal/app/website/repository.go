@@ -17,7 +17,6 @@ type Repository interface {
 	InsertWebsite(userID string, website models.Website) error
 	GetWebsite(userID, websiteID string, website *models.Website) error
 	GetAllWebsite(userID string) (*models.Websites, error)
-	UpdateNameWebsite(userID, websiteID string, website *models.Website) error
 	DeleteWebsite(userID, websiteID string) error
 	DeleteSession(userID, websiteID string) error
 }
@@ -60,7 +59,7 @@ func (instance *repository) InsertWebsite(userID string, website models.Website)
 	docs := models.Website{
 		ID:        website.ID,
 		UserID:    userID,
-		Name:      website.Name,
+		Category:  website.Category,
 		HostName:  website.HostName,
 		URL:       website.URL,
 		CreatedAt: website.CreatedAt,
@@ -98,25 +97,6 @@ func (instance *repository) GetAllWebsite(userID string) (*models.Websites, erro
 		return nil, err
 	}
 	return &websites, nil
-}
-
-func (instance *repository) UpdateNameWebsite(userID, websiteID string, website *models.Website) error {
-	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
-	filter := bson.M{"$and": []bson.M{
-		{"user_id": userID},
-		{"id": websiteID},
-	}}
-	update := bson.M{
-		"$set": bson.M{
-			"name":       website.Name,
-			"updated_at": website.UpdatedAt,
-		},
-	}
-	result := websiteCollection.FindOneAndUpdate(context.Background(), filter, update)
-	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
-	}
-	return nil
 }
 
 func (instance *repository) DeleteWebsite(userID, websiteID string) error {

@@ -82,10 +82,6 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 	fullname := c.PostForm("fullname")
 	password := c.PostForm("password")
 
-	logrus.Info("email", email)
-	logrus.Info("fullname", fullname)
-	logrus.Info("password", password)
-
 	count, err := instance.userUseCase.FindUser(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while check for the email"})
@@ -146,9 +142,6 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	logrus.Info("email", email)
-	logrus.Info("password", password)
-
 	err := instance.userUseCase.GetUserByEmail(email, &user)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"msg": "email not exists"})
@@ -183,7 +176,7 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
 
 	// c.JSON(http.StatusOK, user)
-	c.Redirect(http.StatusMovedPermanently, "/website/dashboard")
+	c.Redirect(http.StatusMovedPermanently, "/profile/details")
 }
 
 func (instance *httpDelivery) Logout(c *gin.Context) {
@@ -237,16 +230,12 @@ func (instance *httpDelivery) GetUser(c *gin.Context) {
 		return
 	}
 
-	logrus.Info(userID)
-
 	getUserErr := instance.userUseCase.GetUserByID(userID, &user)
 	if getUserErr != nil {
 		logrus.Error(getUserErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the user"})
 		return
 	}
-
-	logrus.Info(user)
 
 	c.HTML(http.StatusOK, "profile.html", gin.H{
 		"User": user,
@@ -257,9 +246,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 	fullName := c.PostForm("fullname")
 	password := c.PostForm("password")
 	confirmPassword := c.PostForm("confirmPassword")
-
-	logrus.Info("fullname", fullName)
-	logrus.Info("password", password)
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
@@ -282,6 +268,7 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 	updatedAt := time.Now().Format("2006-01-02, 15:04:05")
 
 	if fullName == "" {
+		logrus.Info("full name ", fullName)
 		if password == confirmPassword {
 			user := models.User{
 				Password:  hash,
@@ -295,10 +282,10 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 		} else {
 			c.Redirect(http.StatusMovedPermanently, "/profile/details")
 		}
-
 	}
 
 	if password == "" {
+		logrus.Info("password ", password)
 		user := models.User{
 			FullName:  fullName,
 			UpdatedAt: updatedAt,

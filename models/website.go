@@ -4,7 +4,7 @@ package models
 type Website struct {
 	ID        string `json:"id" bson:"id"`
 	UserID    string `json:"user_id" bson:"user_id"`
-	Name      string `json:"name" bson:"name"`
+	Category  string `json:"category" bson:"category"`
 	HostName  string `json:"host_name" bson:"host_name"`
 	URL       string `json:"url" bson:"url"`
 	CreatedAt string `json:"created_at" bson:"created_at"`

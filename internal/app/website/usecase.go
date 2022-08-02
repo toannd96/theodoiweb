@@ -11,7 +11,6 @@ type UseCase interface {
 	InsertWebsite(userID string, website models.Website) error
 	GetWebsite(userID, websiteID string, website *models.Website) error
 	GetAllWebsite(userID string) (*models.Websites, error)
-	UpdateNameWebsite(userID, websiteID string, website *models.Website) error
 	DeleteWebsite(userID, websiteID string) error
 	DeleteSession(userID, websiteID string) error
 }
@@ -65,14 +64,6 @@ func (instance *useCase) GetAllWebsite(userID string) (*models.Websites, error) 
 		return nil, err
 	}
 	return websites, nil
-}
-
-func (instance *useCase) UpdateNameWebsite(userID, websiteID string, website *models.Website) error {
-	err := instance.repo.UpdateNameWebsite(userID, websiteID, website)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (instance *useCase) DeleteWebsite(userID, websiteID string) error {
