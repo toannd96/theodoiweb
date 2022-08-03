@@ -171,7 +171,7 @@ func (instance *httpDelivery) Signin(c *gin.Context) {
 	// user.RefreshToken = token.RefreshToken
 
 	// create cookie for client
-	c.SetCookie("access_token", token.AccessToken, 900, "/", "localhost", false, true)
+	c.SetCookie("access_token", token.AccessToken, 86400, "/", "localhost", false, true)
 	// c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
 
 	// c.JSON(http.StatusOK, user)
