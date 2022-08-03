@@ -34,7 +34,7 @@ func main() {
 
 func initializeRoutes(r *gin.Engine) {
 	// Register health check handler
-	r.GET("healthcheck", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "OK",
 		})

@@ -115,7 +115,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 			return
 		}
 
-		c.Redirect(http.StatusMovedPermanently, "/login")
+		c.Redirect(http.StatusMovedPermanently, "/signin")
 	}
 }
 
