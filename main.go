@@ -44,7 +44,7 @@ func initializeRoutes(r *gin.Engine) {
 	r.StaticFile("/record.js", "./web/static/js/record.js")
 
 	r.Static("/js", "./web/static/js")
-	r.Static("/assets", "./web/static/assets")
+	r.Static("/img", "./web/static/img")
 	r.Static("/css", "./web/static/css")
 	r.Use(middleware.CORSMiddleware())
 

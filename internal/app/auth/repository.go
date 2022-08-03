@@ -24,17 +24,17 @@ func NewRepository() Repository {
 
 func (instance *repository) InsertAuth(userID string, tokenDetails *security.TokenDetails) error {
 	at := time.Unix(tokenDetails.AtExpires, 0)
-	rt := time.Unix(tokenDetails.RtExpires, 0)
+	// rt := time.Unix(tokenDetails.RtExpires, 0)
 	now := time.Now()
 
 	errAccess := configs.Redis.Client.Set(tokenDetails.AccessUUID, userID, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}
-	errRefresh := configs.Redis.Client.Set(tokenDetails.RefreshUUID, userID, rt.Sub(now)).Err()
-	if errRefresh != nil {
-		return errRefresh
-	}
+	// errRefresh := configs.Redis.Client.Set(tokenDetails.RefreshUUID, userID, rt.Sub(now)).Err()
+	// if errRefresh != nil {
+	// 	return errRefresh
+	// }
 	return nil
 }
 

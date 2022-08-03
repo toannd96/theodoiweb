@@ -13,6 +13,7 @@ type HTTPDelivery interface {
 	InitRoutes(r *gin.RouterGroup)
 
 	// Other functions to handle HTTP requests
+	ShowHeatmaps(c *gin.Context)
 	GetEventBySessionID(c *gin.Context)
 	SessionReplay(c *gin.Context)
 

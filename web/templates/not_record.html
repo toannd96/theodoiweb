@@ -8,20 +8,71 @@
             {{ template "layout_side_nav.html"}}
             <div id="layoutSidenav_content">
                 <main>
+                    <!-- <div class="container-fluid px-4">
+                        <h1 class="mt-4">Analytics</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Records</li>
+                        </ol>
+                        
+                        <div class="card mb-4">
+
+                            <div class="card-body">
+                                <div class="col-mb-6">
+                                    <select onchange="location = this.value;">
+                                        <option data-hidden="true">Choose website</option>
+                                        {{ range .Websites }}
+                                        <option value="/session/record/{{ .ID }}">{{ .URL }}</option>
+                                        {{ end }}
+                                    </select>
+                                </div>
+                                
+                            </div>
+
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-body">
+
+                                <div class="col-mb-6 text-center">
+                                    <p class="text-center">Copy and paste the tracking code to your website</p>
+                                    <p class="text-center">You have not added the tracking code to your website. Add now to start following</p>
+                                    <a href="/website/list"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add tracking code</button></a>
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                            
+                        </div>
+                    </div> -->
+
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Website</h1>
+                        <h1 class="mt-4">Analytics</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
                             <li class="breadcrumb-item active">Records</li>
                         </ol>
                         <div class="card mb-4">
                             <div class="card-body">
-                                <p>Add your first website</p>
-                                <p>You have not added any website yet. Add now to start tracking</p>
-
                                 <div class="col-mb-6">
-                                    <a href="/website/add"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Website</button></a>
-                                </div>
+                                    <select onchange="location = this.value;">
+                                        <option data-hidden="true">Choose website</option>
+                                        {{ range .Websites }}
+                                        <option value="/session/record/{{ .ID }}">{{ .URL }}</option>
+                                        {{ end }}
+                                    </select>
+                                </div>   
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="col-mb-6 text-center">
+                                    <p>Copy and paste the tracking code to your website</p>
+                                    <p>You have not added the tracking code to your website. Add now to start following</p>
+                                    <a href="/website/list"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add tracking code</button></a>
+                                </div>   
                             </div>
                         </div>
                     </div>

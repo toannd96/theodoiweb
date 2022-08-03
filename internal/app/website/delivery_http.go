@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type httpDelivery struct {
@@ -116,7 +115,6 @@ func (instance *httpDelivery) GetAllWebsite(c *gin.Context) {
 		return
 	}
 
-	logrus.Info("len list website ", len(*websites))
 	if len(*websites) == 0 {
 		c.HTML(http.StatusOK, "website.html", gin.H{})
 	}
@@ -183,7 +181,6 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 			return
 		}
 
-		// c.JSON(http.StatusOK, website)
 		c.Redirect(http.StatusMovedPermanently, "/website/list")
 	}
 }
@@ -214,6 +211,5 @@ func (instance *httpDelivery) DeleteWebsite(c *gin.Context) {
 		return
 	}
 
-	// c.JSON(http.StatusOK, gin.H{"msg": "delete website success"})
 	c.Redirect(http.StatusMovedPermanently, "/website/list")
 }

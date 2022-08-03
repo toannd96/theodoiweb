@@ -16,15 +16,14 @@
                         </ol>
                         <div class="card mb-4">
                             <div class="card-body">
-                                <!-- {{ if .Websites }} -->
                                 <select onchange="location = this.value;">
-                                    <option data-hidden="true">Choose one website</option>
+                                    <option data-hidden="true">Choose website</option>
                                     {{ range .Websites }}
                                     <option value="/session/record/{{ .ID }}">{{ .URL }}</option>
                                     {{ end }}
                                 </select>
-                                <!-- {{ end }} -->
                             </div>
+
                         </div>
                         <div class="card mb-4">
                             <div class="card-header">

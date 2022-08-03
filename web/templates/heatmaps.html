@@ -1,21 +1,22 @@
-{{ define "dashboard.html" }}
+{{ define "heatmaps.html"}}
 
 {{ template "header.html"}}
 
     <body class="sb-nav-fixed">
         {{ template "layout_top_nav.html"}}
         <div id="layoutSidenav">
-            {{ template "layout_side_nav.html"}}                
+            {{ template "layout_side_nav.html"}}
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Overview</h1>
+                        <h1 class="mt-4">Analytics</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="/website/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Heatmaps</li>
                         </ol>
                         <div class="card mb-4">
                             <div class="card-body text-center">
-                                <p>Dashboard displays the parameters of the website</p>
+                                <p>Heatmap show the location of customer clicks, moves, scrolls on your website as a visual heatmap</p>
                                 <p>The feature will be released in the near future</p>
                             </div>
                         </div>

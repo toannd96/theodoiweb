@@ -11,7 +11,6 @@ import (
 	"analytics-api/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type httpDelivery struct {
@@ -52,7 +51,6 @@ func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 	{
 		profileRoutes.GET("/details", middleware.JWTMiddleware(), instance.GetUser)
 
-		// profileRoutes.GET("/update", middleware.JWTMiddleware(), instance.ShowDetailsUserPage)
 		profileRoutes.POST("/update", middleware.JWTMiddleware(), instance.UpdateUser)
 	}
 }
@@ -169,11 +167,11 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	}
 
 	user.AccessToken = token.AccessToken
-	user.RefreshToken = token.RefreshToken
+	// user.RefreshToken = token.RefreshToken
 
 	// create cookie for client
 	c.SetCookie("access_token", token.AccessToken, 900, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
+	// c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
 
 	// c.JSON(http.StatusOK, user)
 	c.Redirect(http.StatusMovedPermanently, "/profile/details")
@@ -186,31 +184,29 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 		return
 	}
 
-	logrus.Info("delete access token")
 	delAtErr := instance.authUsecase.DeleteAccessToken(accessToken.AccessUUID)
 	if delAtErr != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "error occured while del access token"})
 		return
 	}
 
-	refreshToken, err := security.ExtractRefreshTokenMetadata(c.Request)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"msg": "extract refresh token failed"})
-		return
-	}
+	// refreshToken, err := security.ExtractRefreshTokenMetadata(c.Request)
+	// if err != nil {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"msg": "extract refresh token failed"})
+	// 	return
+	// }
 
-	logrus.Info("delete refresh token")
-	delRtErr := instance.authUsecase.DeleteRefreshToken(refreshToken.RefreshUUID)
-	if delRtErr != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"msg": "error occured while del refresh token"})
-		return
-	}
+	// logrus.Info("delete refresh token")
+	// delRtErr := instance.authUsecase.DeleteRefreshToken(refreshToken.RefreshUUID)
+	// if delRtErr != nil {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"msg": "error occured while del refresh token"})
+	// 	return
+	// }
 
-	logrus.Info("delete access from cookie token")
 	c.SetCookie("access_token", "", -1, "", "", false, true)
 
-	logrus.Info("delete refresh from cookie token")
-	c.SetCookie("refresh_token", "", -1, "", "", false, true)
+	// logrus.Info("delete refresh from cookie token")
+	// c.SetCookie("refresh_token", "", -1, "", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{})
 	c.Redirect(http.StatusMovedPermanently, "/login")
@@ -232,7 +228,6 @@ func (instance *httpDelivery) GetUser(c *gin.Context) {
 
 	getUserErr := instance.userUseCase.GetUserByID(userID, &user)
 	if getUserErr != nil {
-		logrus.Error(getUserErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the user"})
 		return
 	}
@@ -268,7 +263,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 	updatedAt := time.Now().Format("2006-01-02, 15:04:05")
 
 	if fullName == "" {
-		logrus.Info("full name ", fullName)
 		if password == confirmPassword {
 			user := models.User{
 				Password:  hash,
@@ -285,7 +279,6 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 	}
 
 	if password == "" {
-		logrus.Info("password ", password)
 		user := models.User{
 			FullName:  fullName,
 			UpdatedAt: updatedAt,
@@ -314,6 +307,5 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 		}
 	}
 
-	// c.JSON(http.StatusOK, gin.H{"msg": "update user success"})
 	c.Redirect(http.StatusMovedPermanently, "/profile/details")
 }

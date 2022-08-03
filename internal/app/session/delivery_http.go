@@ -42,12 +42,17 @@ func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 	// Register routes session
 	sessionRoutes := r.Group("session")
 	{
+		sessionRoutes.GET("/heatmaps", middleware.JWTMiddleware(), instance.ShowHeatmaps)
 		sessionRoutes.GET("/record", middleware.JWTMiddleware(), instance.ListWebsiteOfSessionRecord)
 		sessionRoutes.GET("/record/:website_id", middleware.JWTMiddleware(), instance.ListSessionRecord)
 		sessionRoutes.POST("/receive", instance.ReceiveSession)
 		sessionRoutes.GET("/:session_id", middleware.JWTMiddleware(), instance.SessionReplay)
 		sessionRoutes.GET("/event/:session_id", middleware.JWTMiddleware(), instance.GetEventBySessionID)
 	}
+}
+
+func (instance *httpDelivery) ShowHeatmaps(c *gin.Context) {
+	c.HTML(http.StatusOK, "heatmaps.html", gin.H{})
 }
 
 // GetEventBySessionID streaming all event of session by session id
@@ -176,21 +181,16 @@ func (instance *httpDelivery) ListWebsiteOfSessionRecord(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get all website"})
 		return
 	}
-	logrus.Info("len list website list session record ", len(*websites))
 	if len(*websites) == 0 {
-		c.HTML(http.StatusOK, "not_record.html", gin.H{})
+		c.HTML(http.StatusOK, "not_website.html", gin.H{})
+	} else {
+		c.HTML(http.StatusOK, "tables.html", gin.H{
+			"Websites": websites,
+		})
 	}
-
-	websiteID := c.Param("website_id")
-	logrus.Info("websiteID ", websiteID)
-
-	c.HTML(http.StatusOK, "tables.html", gin.H{
-		"Websites": websites,
-	})
 }
 
 func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
-	logrus.Info("111")
 	var session models.Session
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
@@ -212,14 +212,12 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	}
 
 	websiteID := c.Param("website_id")
-	logrus.Info("websiteID ", websiteID)
 	listSessionID, err := instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
 	if err != nil {
 		logrus.Error(c, err)
 		return
 	}
 
-	logrus.Info("listSessionID ", listSessionID)
 	if len(listSessionID) != 0 {
 		listSession, err := instance.sessionUseCase.GetAllSession(userID, websiteID, listSessionID, session)
 		if err != nil {
@@ -227,18 +225,14 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 			return
 		}
 
-		logrus.Info("listSession ", listSession)
 		c.HTML(http.StatusOK, "tables.html", gin.H{
 			"Websites": websites,
 			"Sessions": listSession,
 		})
-
-		// c.JSON(http.StatusOK, listSession)
 	} else {
-		// c.JSON(http.StatusNotFound, gin.H{"msg": "session record not exists"})
-		// c.HTML(http.StatusOK, "tables.html", gin.H{})
-		logrus.Info(222)
-		c.Redirect(http.StatusMovedPermanently, "/session/record")
+		c.HTML(http.StatusOK, "not_record.html", gin.H{
+			"Websites": websites,
+		})
 		return
 	}
 }

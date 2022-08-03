@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/sirupsen/logrus"
 )
 
 func ExtractAccessToken(r *http.Request) string {
@@ -28,7 +27,6 @@ func VerifyAccessToken(r *http.Request) (*jwt.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	logrus.Info("token ", token.Valid)
 	return token, nil
 }
 
@@ -40,7 +38,6 @@ func AccessTokenValid(r *http.Request) error {
 	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
 		return err
 	}
-	logrus.Info("token ", token.Valid)
 	return nil
 }
 
