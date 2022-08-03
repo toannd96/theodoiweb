@@ -192,6 +192,7 @@ func (instance *httpDelivery) ListWebsiteOfSessionRecord(c *gin.Context) {
 
 func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	var session models.Session
+	var listSessionID []string
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
@@ -212,10 +213,27 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	}
 
 	websiteID := c.Param("website_id")
-	listSessionID, err := instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
-	if err != nil {
-		logrus.Error(c, err)
-		return
+	query := c.Query("time")
+
+	switch query {
+	case "today":
+		listSessionID, err = instance.sessionUseCase.GetSessionIDToday(userID, websiteID, session)
+		if err != nil {
+			logrus.Error(c, err)
+			return
+		}
+	case "all":
+		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
+		if err != nil {
+			logrus.Error(c, err)
+			return
+		}
+	default:
+		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
+		if err != nil {
+			logrus.Error(c, err)
+			return
+		}
 	}
 
 	if len(listSessionID) != 0 {
@@ -226,14 +244,23 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "tables.html", gin.H{
-			"Websites": websites,
-			"Sessions": listSession,
+			"WebsiteID": websiteID,
+			"Websites":  websites,
+			"Sessions":  listSession,
 		})
 	} else {
-		c.HTML(http.StatusOK, "not_record.html", gin.H{
-			"Websites": websites,
-		})
-		return
+		switch query {
+		case "today":
+			c.HTML(http.StatusOK, "not_record_today.html", gin.H{
+				"Websites": websites,
+			})
+			return
+		default:
+			c.HTML(http.StatusOK, "not_record.html", gin.H{
+				"Websites": websites,
+			})
+			return
+		}
 	}
 }
 

@@ -8,6 +8,8 @@ import (
 type UseCase interface {
 	GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error)
 	GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error)
+
+	GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error)
 	GetSession(userID, sessionID string, session *models.Session) error
 	GetCountSession(userID, sessionID string) (int64, error)
 	InsertSession(session models.Session, events []models.Event) error
@@ -47,9 +49,18 @@ func (instance *useCase) GetAllSession(userID, websiteID string, listSessionID [
 	return listSession, nil
 }
 
-// GetAllSessionID get all id of session
+// GetAllSessionID get all id of session all time
 func (instance *useCase) GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error) {
 	listSessionID, err := instance.repo.GetAllSessionID(userID, websiteID, session)
+	if err != nil {
+		return nil, err
+	}
+	return listSessionID, nil
+}
+
+// GetAllSessionID get all id of session today
+func (instance *useCase) GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error) {
+	listSessionID, err := instance.repo.GetSessionIDToday(userID, websiteID, session)
 	if err != nil {
 		return nil, err
 	}

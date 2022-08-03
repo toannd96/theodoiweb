@@ -17,7 +17,10 @@ import (
 type Repository interface {
 	GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error)
 	GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error)
+
+	GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error)
 	GetSession(userID, sessionID string, session *models.Session) error
+
 	GetCountSession(userID, sessionID string) (int64, error)
 	InsertSession(session models.Session, event models.Event) error
 
@@ -77,13 +80,46 @@ func (instance *repository) GetAllSession(userID, websiteID string, listSessionI
 	return listSession, nil
 }
 
-// GetAllSessionID get all id of session
+// GetAllSessionID get all id of session all time
 func (instance *repository) GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error) {
 	var listSessionID []string
 	filter := bson.M{"$and": []bson.M{
 		{"meta_data.user_id": userID},
 		{"meta_data.website_id": websiteID},
 	}}
+
+	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
+	cursor, err := sessionCollection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(context.TODO()) {
+		err := cursor.Decode(&session)
+		if err != nil {
+			return nil, err
+		}
+		listSessionID = append(listSessionID, session.MetaData.ID)
+	}
+	listSessionID = str.RemoveDuplicateValues(listSessionID)
+	return listSessionID, nil
+}
+
+// GetAllSessionID get all id of session today
+func (instance *repository) GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error) {
+	var listSessionID []string
+
+	fromDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	toDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 24, 0, 0, 0, time.UTC)
+
+	filter := bson.M{"$and": []bson.M{
+		{"meta_data.user_id": userID},
+		{"meta_data.website_id": websiteID},
+		{"time_report": bson.M{
+			"$gt": fromDate,
+			"$lt": toDate,
+		}},
+	}}
+
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
 	cursor, err := sessionCollection.Find(context.TODO(), filter)
 	if err != nil {

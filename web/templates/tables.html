@@ -26,14 +26,17 @@
 
                         </div>
                         <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="fas fa-table me-1"></i>
+                            <div class="card-header d-flex justify-content-between">
+                                <!-- <i class="fas fa-table me-1"></i> -->
                                 Session Records
 
-                                <!-- <select onchange="location = this.value;">
-                                    <option>All time</option>
-                                    <option>One day</option>
-                                </select> -->
+                                {{ if .Sessions }}
+                                <select onchange="location = this.value;">
+                                    <option data-hidden="true">Choose time</option>
+                                    <option value="/session/record/{{ .WebsiteID }}?time=all">All Time</option>
+                                    <option value="/session/record/{{ .WebsiteID }}?time=today">Today</option>
+                                </select>
+                                {{ end }}
                             </div>
                             
                             <div class="card-body">
