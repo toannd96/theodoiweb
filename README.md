@@ -100,10 +100,13 @@ go run main.go
         ├── dashboard.html
         ├── footer.html
         ├── header.html
+        ├── heatmaps.html
         ├── layout_side_nav.html
         ├── layout_top_nav.html
         ├── login.html
-        ├── password.html
+        ├── not_record.html
+        ├── not_record_today.html
+        ├── not_website.html
         ├── profile.html
         ├── register.html
         ├── tables.html
