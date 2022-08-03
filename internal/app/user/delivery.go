@@ -13,9 +13,9 @@ type HTTPDelivery interface {
 
 	// Other functions to handle HTTP requests
 	ShowSignupPage(c *gin.Context)
-	ShowLoginPage(c *gin.Context)
+	ShowSigninPage(c *gin.Context)
 	SignUp(c *gin.Context)
-	Login(c *gin.Context)
+	Signin(c *gin.Context)
 	Logout(c *gin.Context)
 	GetUser(c *gin.Context)
 	ShowDetailsUserPage(c *gin.Context)

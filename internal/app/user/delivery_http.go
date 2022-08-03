@@ -42,8 +42,8 @@ func (instance *httpDelivery) InitRoutes(r *gin.RouterGroup) {
 	r.GET("/signup", instance.ShowSignupPage)
 	r.POST("/signup", instance.SignUp)
 
-	r.GET("/login", instance.ShowLoginPage)
-	r.POST("/login", instance.Login)
+	r.GET("/signin", instance.ShowSigninPage)
+	r.POST("/signin", instance.Signin)
 
 	r.GET("/logout", middleware.JWTMiddleware(), instance.Logout)
 
@@ -82,7 +82,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 
 	count, err := instance.userUseCase.FindUser(email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while check for the email"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -92,7 +92,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 	} else {
 		hash, err := security.HashPassword(password)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while hash password"})
+			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
 		}
 
@@ -111,7 +111,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 
 		insertErr := instance.userUseCase.InsertUser(user)
 		if insertErr != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while insert user"})
+			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
 		}
 
@@ -119,11 +119,11 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 	}
 }
 
-func (instance *httpDelivery) ShowLoginPage(c *gin.Context) {
+func (instance *httpDelivery) ShowSigninPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", gin.H{})
 }
 
-func (instance *httpDelivery) Login(c *gin.Context) {
+func (instance *httpDelivery) Signin(c *gin.Context) {
 	var user models.User
 	// var request RequestSignIn
 	// if err := c.ShouldBindJSON(&request); err != nil {
@@ -143,6 +143,7 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	err := instance.userUseCase.GetUserByEmail(email, &user)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"msg": "email not exists"})
+		// c.HTML(http.StatusNotFound, "404.html", gin.H{})
 		return
 	}
 
@@ -156,13 +157,13 @@ func (instance *httpDelivery) Login(c *gin.Context) {
 	// create token
 	token, err := security.CreateToken(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while create token"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
 	InsertAuthErr := instance.authUsecase.InsertAuth(user.ID, token)
 	if InsertAuthErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while insert auth token"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -208,8 +209,8 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 	// logrus.Info("delete refresh from cookie token")
 	// c.SetCookie("refresh_token", "", -1, "", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{})
-	c.Redirect(http.StatusMovedPermanently, "/login")
+	// c.JSON(http.StatusOK, gin.H{})
+	c.Redirect(http.StatusMovedPermanently, "/signin")
 }
 
 func (instance *httpDelivery) GetUser(c *gin.Context) {
@@ -228,7 +229,7 @@ func (instance *httpDelivery) GetUser(c *gin.Context) {
 
 	getUserErr := instance.userUseCase.GetUserByID(userID, &user)
 	if getUserErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the user"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -256,7 +257,7 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	hash, err := security.HashPassword(password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while hash password"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -270,7 +271,7 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 			}
 			err := instance.userUseCase.UpdatePassword(userID, &user)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user password"})
+				c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 				return
 			}
 		} else {
@@ -285,7 +286,7 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 		}
 		err := instance.userUseCase.UpdateFullName(userID, &user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user full name"})
+			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
 		}
 	}
@@ -299,7 +300,7 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 			}
 			updateUserErr := instance.userUseCase.UpdateUser(userID, &user)
 			if updateUserErr != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while update user"})
+				c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 				return
 			}
 		} else {

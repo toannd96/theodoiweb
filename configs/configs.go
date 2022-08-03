@@ -15,8 +15,8 @@ var (
 
 	PathGeoDB string
 
-	AccessSecretKey  string
-	RefreshSecretKey string
+	AccessSecretKey string
+	// RefreshSecretKey string
 
 	MongoDB struct {
 		Client            *mongo.Database
@@ -44,7 +44,7 @@ func init() {
 	AppURL = os.Getenv("APP_URL")
 	PathGeoDB = os.Getenv("PATH_GEO_DB")
 	AccessSecretKey = os.Getenv("ACCESS_SECRET")
-	RefreshSecretKey = os.Getenv("REFRESH_SECRET")
+	// RefreshSecretKey = os.Getenv("REFRESH_SECRET")
 
 	MongoDB.URI = os.Getenv("URI")
 	MongoDB.Name = os.Getenv("NAME")

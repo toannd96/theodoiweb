@@ -28,6 +28,16 @@
                         </div>
 
                         <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between">
+                                Session Records
+
+                                <select onchange="location = this.value;">
+                                    <option data-hidden="true">Choose time</option>
+                                    <option value="/session/record/{{ .WebsiteID }}?time=all">All Time</option>
+                                    <option value="/session/record/{{ .WebsiteID }}?time=today">Today</option>
+                                </select>
+                            </div>
+                            
                             <div class="card-body">
                                 <div class="col-mb-6 text-center">
                                     <p>There are no records for today</p>

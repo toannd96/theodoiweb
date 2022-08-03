@@ -178,7 +178,7 @@ func (instance *httpDelivery) ListWebsiteOfSessionRecord(c *gin.Context) {
 
 	websites, err := instance.websiteUseCase.GetAllWebsite(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get all website"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 	if len(*websites) == 0 {
@@ -208,7 +208,7 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 
 	websites, err := instance.websiteUseCase.GetAllWebsite(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get all website"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -277,7 +277,7 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 
 	countSites, err := instance.websiteUseCase.FindWebsiteByID(request.UserID, request.WebsiteID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while check for the website id"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 

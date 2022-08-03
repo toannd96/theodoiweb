@@ -89,7 +89,7 @@ func (instance *httpDelivery) GetWebsite(c *gin.Context) {
 
 	getWebsiteErr := instance.websiteUseCase.GetWebsite(userID, websiteID, &website)
 	if getWebsiteErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the website by id"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -111,7 +111,7 @@ func (instance *httpDelivery) GetAllWebsite(c *gin.Context) {
 
 	websites, err := instance.websiteUseCase.GetAllWebsite(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get all website"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -130,7 +130,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 
 	hostName, err := str.ParseURL(url)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while parse url the website"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -148,7 +148,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 
 	count, err := instance.websiteUseCase.FindWebsite(userID, hostName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while check for the email"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
@@ -159,7 +159,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 
 		websiteID := str.GetMD5Hash(hostName)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while create id for the website"})
+			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
 		}
 
@@ -177,7 +177,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 
 		insertErr := instance.websiteUseCase.InsertWebsite(userID, website)
 		if insertErr != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"msg": "error occured while insert website"})
+			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
 		}
 
@@ -201,13 +201,13 @@ func (instance *httpDelivery) DeleteWebsite(c *gin.Context) {
 
 	deleteWebsiteErr := instance.websiteUseCase.DeleteWebsite(userID, websiteID)
 	if deleteWebsiteErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the website by id"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
 	deleteSessionErr := instance.websiteUseCase.DeleteSession(userID, websiteID)
 	if deleteSessionErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while get the website by id"})
+		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
