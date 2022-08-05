@@ -156,9 +156,13 @@ $ heroku logs --tail
 
 ![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/list_website.png)
 
-- Generate tracking code 
+- Add tracking code 
 
 ![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/add_tracking.png)
+
+- Generate tracking code 
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/generate_tracking.png)
 
 - Not record 
 
