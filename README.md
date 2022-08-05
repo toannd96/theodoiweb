@@ -135,3 +135,39 @@ $ git push heroku master
 $ heroku ps:scale web=1
 $ heroku logs --tail
 ```
+### Key features
+- Sign up
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/signup.png)
+
+- Sign in
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/signin.png)
+
+- Profile
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/profile.png)
+
+- Add website
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/add_website.png)
+
+- List website
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/list_website.png)
+
+- Generate tracking code 
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/add_tracking.png)
+
+- Not record 
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/not_record.png)
+
+- Records
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/records.png)
+
+- Replay
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/replay.png)
