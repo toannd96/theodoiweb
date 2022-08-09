@@ -3,6 +3,16 @@
 {{ template "header.html"}}
 
     <body style="background-color: #E0FFFF;">
+        <nav class="navbar navbar-expand-lg navbar">
+            <div class="container px-5">
+                <a class="navbar-brand" href="/">Theodoiweb</a>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">Already got an account? <a href="/signin" class="button">Sign in</a></li>
+                        
+                    </ul>
+            </div>
+        </nav>
+
         <div id="layoutAuthentication">
             <div id="layoutAuthentication_content">
                 <main>
@@ -40,22 +50,22 @@
 
                                         <hr class="my-4">
                                             
-                                        <button class="w-100 py-2 mb-2 btn btn-outline-dark rounded-3" type="submit">
+                                        <button class="w-100 py-2 mb-2 btn btn-outline-primary rounded-3" type="submit">
                                         <svg class="bi me-1" width="16" height="16"><use xlink:href="#twitter"/></svg>
                                         <i class="fab fa-google me-2"></i>
                                         Sign up with Google
                                         </button>
 
-                                        <button class="w-100 py-2 mb-2 btn btn-outline-primary rounded-3" type="submit">
-                                        <svg class="bi me-1" width="16" height="16"><use xlink:href="#facebook"/></svg>
-                                        <i class="fab fa-facebook-f me-2"></i>
-                                        Sign up with Facebook
+                                        <button class="w-100 py-2 mb-2 btn btn-outline-dark rounded-3" type="submit">
+                                        <svg class="bi me-1" width="16" height="16"><use xlink:href="#github"/></svg>
+                                        <i class="fa-brands fa-github me-2"></i>
+                                        Sign up with Github
                                         </button>
 
                                     </div>
-                                    <div class="card-footer text-center py-3">
+                                    <!-- <div class="card-footer text-center py-3">
                                         <div class="small"><a href="/signin">Have an account? Go to sign in</a></div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,84 @@
+{{ define "home.html" }}
+
+{{ template "header.html"}}
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container px-5">
+                <a class="navbar-brand" href="/">Theodoiweb</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/signin">Sign in</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/signup">Sign up</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container px-4 px-lg-5">
+            
+            <div class="row gx-4 gx-lg-5 align-items-center my-5">
+                <div class="col-lg-7"><img class="img-fluid rounded mb-4 mb-lg-0" src="assets/img/home_replay.png" alt="..." /></div>
+                <div class="col-lg-5">
+                    <h1 class="font-weight-light">Analytics user behavior on the website</h1>
+                    <p>Record and replay complete user interactions on websites, including clicks,
+                        page visits, mouse movements, tapping and scrolling</p>
+                </div>
+            </div>
+
+            <section class="pt-4">
+                <div class="container px-lg-5">
+                    <div class="features-header text-center">
+                        <div class="container-sm">
+                            <h2 class="section-title mt-0">Meet Theodoiweb</h1>
+                            <p class="section-paragraph">Here is a list of several interesting use cases for Theodoiweb.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+                
+            <section class="pt-4">
+                <div class="container px-lg-5">
+                    <div class="row gx-4 gx-lg-5 text-center">
+
+                        <div class="col-md-4 mb-5">
+                            <div class="card-body">
+                                <div class="sb-nav-link-icon mb-4 mt-n4"><i class="fa-solid fa-chart-simple fa-2xl" style="color:rgb(33, 143, 206)"></i></div>
+                                <h2 class="card-title">User analysis</h2>
+                                <p class="card-text">With the pixel-perfect replay of what users do on your site, you
+                                    will find it easy to understand your users and optimize their
+                                    experience.</p>
+                            </div>
+                        </div>
+        
+                        <div class="col-md-4 mb-5">
+                            <div class="card-body">
+                                <div class="sb-nav-link-icon mb-4 mt-n4"><i class="fa-solid fa-bug fa-2xl" style="color:rgb(206, 96, 33)"></i></div>
+                                <h2 class="card-title">Reproduce bugs</h2>
+                                <p class="card-text">You can replay problem and debug it in your browser remotely
+                                    with consistent behavior. This lets you understand the cause of bug.</p>
+                            </div>
+                        </div>
+        
+                        <div class="col-md-4 mb-5">
+                            <div class="card-body">
+                                <div class="sb-nav-link-icon mb-4 mt-n4"><i class="fa-solid fa-circle-play fa-2xl" style="color:rgb(7, 151, 7)"></i></div>
+                                <h2 class="card-title">Demonstrate web</h2>
+                                <p class="card-text">Instead of recording videos to show your website, Theodoiweb provides a
+                                    more lightweight and pixel-perfect way of doing that.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+                
+            
+        </div>
+        {{ template "footer.html"}}
+    </body>
+</html>
+
+{{ end }}

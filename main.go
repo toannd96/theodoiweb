@@ -35,9 +35,7 @@ func main() {
 func initializeRoutes(r *gin.Engine) {
 	// Register health check handler
 	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "OK",
-		})
+		c.HTML(200, "home.html", gin.H{})
 	})
 
 	r.LoadHTMLGlob("web/templates/**")
