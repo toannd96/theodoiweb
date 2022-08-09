@@ -87,7 +87,8 @@ go run main.go
     ├── static
     │   ├── assets
     │   │   └── img
-    │   │       └── error-404-monochrome.svg
+    │   │       ├── error-404-monochrome.svg
+    │   │       └── home_replay.png
     │   ├── css
     │   │   └── styles.css
     │   └── js
@@ -101,6 +102,7 @@ go run main.go
         ├── footer.html
         ├── header.html
         ├── heatmaps.html
+        ├── home.html
         ├── layout_side_nav.html
         ├── layout_top_nav.html
         ├── login.html
