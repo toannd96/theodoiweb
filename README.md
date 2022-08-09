@@ -138,6 +138,10 @@ $ heroku ps:scale web=1
 $ heroku logs --tail
 ```
 ### Key features
+- Home page
+
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/homepage.png)
+
 - Sign up
 
 ![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/signup.png)
@@ -160,15 +164,11 @@ $ heroku logs --tail
 
 - Add tracking code 
 
-![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/add_tracking.png)
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/add_tracking_code.png)
 
 - Generate tracking code 
 
-![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/generate_tracking.png)
-
-- Not record 
-
-![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/not_record.png)
+![](https://github.com/dactoankmapydev/analytics-app/blob/master/picture/tracking_code.png)
 
 - Records
 
