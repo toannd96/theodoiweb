@@ -29,3 +29,6 @@ jobs:
 
       - name: Run golangci-lint
         run: $(go env GOPATH)/bin/golangci-lint run ./...
+        
+      - name: Run unit test.
+        run: make test-coverage
