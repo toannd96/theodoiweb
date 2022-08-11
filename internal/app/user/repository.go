@@ -78,7 +78,7 @@ func (instance *repository) UpdateFullName(userID string, user *models.User) err
 	}
 	result := userCollection.FindOneAndUpdate(context.Background(), filter, update)
 	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
+		logrus.Error("update failed: ", result.Err())
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (instance *repository) UpdatePassword(userID string, user *models.User) err
 	}
 	result := userCollection.FindOneAndUpdate(context.Background(), filter, update)
 	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
+		logrus.Error("update failed: ", result.Err())
 	}
 	return nil
 }
@@ -111,7 +111,7 @@ func (instance *repository) UpdateUser(userID string, user *models.User) error {
 	}
 	result := userCollection.FindOneAndUpdate(context.Background(), filter, update)
 	if result.Err() != nil {
-		logrus.Error("update failed: %v\n", result.Err())
+		logrus.Error("update failed: ", result.Err())
 	}
 	return nil
 }
