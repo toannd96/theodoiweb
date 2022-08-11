@@ -16,9 +16,21 @@ func main() {
 	var err error
 
 	db.NewMongo()
-	db.CreateUserCollection()
-	db.CreateWebsiteCollection()
-	db.CreateSessionCollection()
+
+	userErr := db.CreateUserCollection()
+	if userErr != nil {
+		logrus.Fatalln(userErr)
+	}
+
+	webErr := db.CreateWebsiteCollection()
+	if webErr != nil {
+		logrus.Fatalln(webErr)
+	}
+
+	sessionErr := db.CreateSessionCollection()
+	if sessionErr != nil {
+		logrus.Fatalln(sessionErr)
+	}
 
 	db.NewRedis()
 

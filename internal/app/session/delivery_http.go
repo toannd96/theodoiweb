@@ -124,7 +124,10 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 			c.Writer.Flush()
 		case message := <-breakLineChan:
 			enc := json.NewEncoder(c.Writer)
-			enc.Encode(message)
+			if err := enc.Encode(message); err != nil {
+				logrus.Error("encode msg: ", err)
+				return
+			}
 			c.Writer.Flush()
 		case <-breakChan:
 			return
