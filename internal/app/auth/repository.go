@@ -5,6 +5,8 @@ import (
 	"analytics-api/internal/pkg/security"
 
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Repository ...
@@ -29,6 +31,7 @@ func (instance *repository) InsertAuth(userID string, tokenDetails *security.Tok
 
 	errAccess := configs.Redis.Client.Set(tokenDetails.AccessUUID, userID, at.Sub(now)).Err()
 	if errAccess != nil {
+		logrus.Error("Redis set at error ", errAccess)
 		return errAccess
 	}
 	// errRefresh := configs.Redis.Client.Set(tokenDetails.RefreshUUID, userID, rt.Sub(now)).Err()

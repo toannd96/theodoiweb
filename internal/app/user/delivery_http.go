@@ -11,6 +11,7 @@ import (
 	"analytics-api/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type httpDelivery struct {
@@ -157,12 +158,14 @@ func (instance *httpDelivery) Signin(c *gin.Context) {
 	// create token
 	token, err := security.CreateToken(user.ID)
 	if err != nil {
+		logrus.Error("Create token error ", err)
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
 	InsertAuthErr := instance.authUsecase.InsertAuth(user.ID, token)
 	if InsertAuthErr != nil {
+		logrus.Error("Insert auth error ", err)
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
@@ -171,7 +174,7 @@ func (instance *httpDelivery) Signin(c *gin.Context) {
 	// user.RefreshToken = token.RefreshToken
 
 	// create cookie for client
-	c.SetCookie("access_token", token.AccessToken, 86400, "/", "localhost", false, true)
+	c.SetCookie("access_token", token.AccessToken, 86400, "/", "theodoiweb.fly.dev", false, true)
 	// c.SetCookie("refresh_token", token.RefreshToken, 86400, "/", "localhost", false, true)
 
 	// c.JSON(http.StatusOK, user)
