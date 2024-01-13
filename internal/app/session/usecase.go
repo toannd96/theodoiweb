@@ -1,20 +1,16 @@
 package session
 
-import (
-	"analytics-api/models"
-)
-
 // UseCase ...
 type UseCase interface {
-	GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error)
-	GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error)
+	GetAllSession(userID, websiteID string, listSessionID []string, session session) ([]session, error)
+	GetAllSessionID(userID, websiteID string, session session) ([]string, error)
 
-	GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error)
-	GetSession(userID, sessionID string, session *models.Session) error
+	GetSessionIDToday(userID, websiteID string, session session) ([]string, error)
+	GetSession(userID, sessionID string, session *session) error
 	GetCountSession(userID, sessionID string) (int64, error)
-	InsertSession(session models.Session, events []models.Event) error
+	InsertSession(session session, events []event) error
 
-	GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*models.Event, error)
+	GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*event, error)
 
 	GetSessionTimestamp(sessionID string) (int64, error)
 	InsertSessionTimestamp(sessionID string, timeStart int64) error
@@ -32,8 +28,8 @@ func NewUseCase() UseCase {
 }
 
 // GetSession get session by session id
-func (instance *useCase) GetSession(userID, sessionID string, session *models.Session) error {
-	err := instance.repo.GetSession(userID, sessionID, session)
+func (instance *useCase) GetSession(userID, sessionID string, aSession *session) error {
+	err := instance.repo.GetSession(userID, sessionID, aSession)
 	if err != nil {
 		return err
 	}
@@ -41,8 +37,8 @@ func (instance *useCase) GetSession(userID, sessionID string, session *models.Se
 }
 
 // GetAllSession get all session
-func (instance *useCase) GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error) {
-	listSession, err := instance.repo.GetAllSession(userID, websiteID, listSessionID, session)
+func (instance *useCase) GetAllSession(userID, websiteID string, listSessionID []string, aSession session) ([]session, error) {
+	listSession, err := instance.repo.GetAllSession(userID, websiteID, listSessionID, aSession)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +46,8 @@ func (instance *useCase) GetAllSession(userID, websiteID string, listSessionID [
 }
 
 // GetAllSessionID get all id of session all time
-func (instance *useCase) GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error) {
-	listSessionID, err := instance.repo.GetAllSessionID(userID, websiteID, session)
+func (instance *useCase) GetAllSessionID(userID, websiteID string, aSession session) ([]string, error) {
+	listSessionID, err := instance.repo.GetAllSessionID(userID, websiteID, aSession)
 	if err != nil {
 		return nil, err
 	}
@@ -59,8 +55,8 @@ func (instance *useCase) GetAllSessionID(userID, websiteID string, session model
 }
 
 // GetAllSessionID get all id of session today
-func (instance *useCase) GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error) {
-	listSessionID, err := instance.repo.GetSessionIDToday(userID, websiteID, session)
+func (instance *useCase) GetSessionIDToday(userID, websiteID string, aSession session) ([]string, error) {
+	listSessionID, err := instance.repo.GetSessionIDToday(userID, websiteID, aSession)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +64,9 @@ func (instance *useCase) GetSessionIDToday(userID, websiteID string, session mod
 }
 
 // InsertSession insert session
-func (instance *useCase) InsertSession(session models.Session, events []models.Event) error {
+func (instance *useCase) InsertSession(aSession session, events []event) error {
 	for _, event := range events {
-		err := instance.repo.InsertSession(session, event)
+		err := instance.repo.InsertSession(aSession, event)
 		if err != nil {
 			return err
 		}
@@ -88,7 +84,7 @@ func (instance *useCase) GetCountSession(userID, sessionID string) (int64, error
 }
 
 // GetEventByLimitSkip get limit event of session by session id
-func (instance *useCase) GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*models.Event, error) {
+func (instance *useCase) GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*event, error) {
 	events, err := instance.repo.GetEventByLimitSkip(userID, sessionID, limit, skip)
 	if err != nil {
 		return nil, err

@@ -1,16 +1,12 @@
 package website
 
-import (
-	"analytics-api/models"
-)
-
 // UseCase ...
 type UseCase interface {
 	FindWebsite(userID, hostName string) (int64, error)
 	FindWebsiteByID(userID, websiteID string) (int64, error)
-	InsertWebsite(userID string, website models.Website) error
-	GetWebsite(userID, websiteID string, website *models.Website) error
-	GetAllWebsite(userID string) (*models.Websites, error)
+	InsertWebsite(userID string, aWebsite website) error
+	GetWebsite(userID, websiteID string, aWebsite *website) error
+	GetAllWebsite(userID string) (*websites, error)
 	DeleteWebsite(userID, websiteID string) error
 	DeleteSession(userID, websiteID string) error
 }
@@ -42,23 +38,23 @@ func (instance *useCase) FindWebsiteByID(userID, websiteID string) (int64, error
 	return count, nil
 }
 
-func (instance *useCase) InsertWebsite(userID string, website models.Website) error {
-	err := instance.repo.InsertWebsite(userID, website)
+func (instance *useCase) InsertWebsite(userID string, aWebsite website) error {
+	err := instance.repo.InsertWebsite(userID, aWebsite)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) GetWebsite(userID, websiteID string, website *models.Website) error {
-	err := instance.repo.GetWebsite(userID, websiteID, website)
+func (instance *useCase) GetWebsite(userID, websiteID string, aWebsite *website) error {
+	err := instance.repo.GetWebsite(userID, websiteID, aWebsite)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) GetAllWebsite(userID string) (*models.Websites, error) {
+func (instance *useCase) GetAllWebsite(userID string) (*websites, error) {
 	websites, err := instance.repo.GetAllWebsite(userID)
 	if err != nil {
 		return nil, err

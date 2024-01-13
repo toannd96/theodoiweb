@@ -1,4 +1,4 @@
-package models
+package session
 
 import (
 	"time"
@@ -6,16 +6,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Session ...
-type Session struct {
-	MetaData   MetaData  `json:"meta_data" bson:"meta_data"`
+// session ...
+type session struct {
+	MetaData   metaData  `json:"meta_data" bson:"meta_data"`
 	Duration   string    `json:"duration" bson:"duration"`
-	Event      Event     `json:"event" bson:"event"`
+	Event      event     `json:"event" bson:"event"`
 	TimeReport time.Time `json:"time_report" bson:"time_report"`
 }
 
-// MetaData ...
-type MetaData struct {
+// metaData ...
+type metaData struct {
 	ID        string `json:"id" bson:"id"`
 	UserID    string `json:"user_id" bson:"user_id"`
 	WebsiteID string `json:"website_id" bson:"website_id"`
@@ -28,8 +28,8 @@ type MetaData struct {
 	CreatedAt string `json:"created_at" bson:"created_at"`
 }
 
-// Event ...
-type Event struct {
+// event ...
+type event struct {
 	Type      int64  `json:"type" bson:"type"`
 	Data      bson.M `json:"data" bson:"data"`
 	Timestamp int64  `json:"timestamp" bson:"timestamp"`

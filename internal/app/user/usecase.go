@@ -1,18 +1,14 @@
 package user
 
-import (
-	"analytics-api/models"
-)
-
 // UseCase ...
 type UseCase interface {
 	FindUser(email string) (int64, error)
-	InsertUser(user models.User) error
-	GetUserByEmail(email string, user *models.User) error
-	GetUserByID(userID string, user *models.User) error
-	UpdateUser(userID string, user *models.User) error
-	UpdateFullName(userID string, user *models.User) error
-	UpdatePassword(userID string, user *models.User) error
+	InsertUser(user user) error
+	GetUserByEmail(email string, user *user) error
+	GetUserByID(userID string, user *user) error
+	UpdateUser(userID string, user *user) error
+	UpdateFullName(userID string, user *user) error
+	UpdatePassword(userID string, user *user) error
 }
 
 type useCase struct {
@@ -34,48 +30,48 @@ func (instance *useCase) FindUser(email string) (int64, error) {
 	return count, nil
 }
 
-func (instance *useCase) InsertUser(user models.User) error {
-	err := instance.repo.InsertUser(user)
+func (instance *useCase) InsertUser(anUser user) error {
+	err := instance.repo.InsertUser(anUser)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) GetUserByEmail(email string, user *models.User) error {
-	err := instance.repo.GetUserByEmail(email, user)
+func (instance *useCase) GetUserByEmail(email string, anUser *user) error {
+	err := instance.repo.GetUserByEmail(email, anUser)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) GetUserByID(userID string, user *models.User) error {
-	err := instance.repo.GetUserByID(userID, user)
+func (instance *useCase) GetUserByID(userID string, anUser *user) error {
+	err := instance.repo.GetUserByID(userID, anUser)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) UpdateFullName(userID string, user *models.User) error {
-	err := instance.repo.UpdateFullName(userID, user)
+func (instance *useCase) UpdateFullName(userID string, anUser *user) error {
+	err := instance.repo.UpdateFullName(userID, anUser)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) UpdatePassword(userID string, user *models.User) error {
-	err := instance.repo.UpdatePassword(userID, user)
+func (instance *useCase) UpdatePassword(userID string, anUser *user) error {
+	err := instance.repo.UpdatePassword(userID, anUser)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *useCase) UpdateUser(userID string, user *models.User) error {
-	err := instance.repo.UpdateUser(userID, user)
+func (instance *useCase) UpdateUser(userID string, anUser *user) error {
+	err := instance.repo.UpdateUser(userID, anUser)
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"analytics-api/configs"
-	"analytics-api/models"
 
 	"github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
@@ -14,9 +13,9 @@ import (
 type Repository interface {
 	FindWebsite(userID, hostName string) (int64, error)
 	FindWebsiteByID(userID, websiteID string) (int64, error)
-	InsertWebsite(userID string, website models.Website) error
-	GetWebsite(userID, websiteID string, website *models.Website) error
-	GetAllWebsite(userID string) (*models.Websites, error)
+	InsertWebsite(userID string, website website) error
+	GetWebsite(userID, websiteID string, website *website) error
+	GetAllWebsite(userID string) (*websites, error)
 	DeleteWebsite(userID, websiteID string) error
 	DeleteSession(userID, websiteID string) error
 }
@@ -54,16 +53,16 @@ func (instance *repository) FindWebsiteByID(userID, websiteID string) (int64, er
 	return count, nil
 }
 
-func (instance *repository) InsertWebsite(userID string, website models.Website) error {
+func (instance *repository) InsertWebsite(userID string, aWebsite website) error {
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
-	docs := models.Website{
-		ID:        website.ID,
+	docs := website{
+		ID:        aWebsite.ID,
 		UserID:    userID,
-		Category:  website.Category,
-		HostName:  website.HostName,
-		URL:       website.URL,
-		CreatedAt: website.CreatedAt,
-		UpdatedAt: website.UpdatedAt,
+		Category:  aWebsite.Category,
+		HostName:  aWebsite.HostName,
+		URL:       aWebsite.URL,
+		CreatedAt: aWebsite.CreatedAt,
+		UpdatedAt: aWebsite.UpdatedAt,
 	}
 	_, err := websiteCollection.InsertOne(context.TODO(), docs)
 	if err != nil {
@@ -72,21 +71,21 @@ func (instance *repository) InsertWebsite(userID string, website models.Website)
 	return nil
 }
 
-func (instance *repository) GetWebsite(userID, websiteID string, website *models.Website) error {
+func (instance *repository) GetWebsite(userID, websiteID string, aWebsite *website) error {
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
 	filter := bson.M{"$and": []bson.M{
 		{"user_id": userID},
 		{"id": websiteID},
 	}}
-	err := websiteCollection.FindOne(context.TODO(), filter).Decode(&website)
+	err := websiteCollection.FindOne(context.TODO(), filter).Decode(&aWebsite)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (instance *repository) GetAllWebsite(userID string) (*models.Websites, error) {
-	var websites models.Websites
+func (instance *repository) GetAllWebsite(userID string) (*websites, error) {
+	var websites websites
 	websiteCollection := configs.MongoDB.Client.Collection(configs.MongoDB.WebsiteCollection)
 	filter := bson.M{"user_id": userID}
 	cursor, err := websiteCollection.Find(context.TODO(), filter)

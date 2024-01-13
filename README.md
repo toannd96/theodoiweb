@@ -34,9 +34,9 @@ go run main.go
 │   ├── mongo.go
 │   └── redis.go
 ├── Dockerfile
+├── fly.toml
 ├── go.mod
 ├── go.sum
-├── heroku.yml
 ├── internal
 │   ├── app
 │   │   ├── auth
@@ -45,16 +45,19 @@ go run main.go
 │   │   ├── session
 │   │   │   ├── delivery.go
 │   │   │   ├── delivery_http.go
+│   │   │   ├── model.go
 │   │   │   ├── repository.go
 │   │   │   └── usecase.go
 │   │   ├── user
 │   │   │   ├── delivery.go
 │   │   │   ├── delivery_http.go
+│   │   │   ├── model.go
 │   │   │   ├── repository.go
 │   │   │   └── usecase.go
 │   │   └── website
 │   │       ├── delivery.go
 │   │       ├── delivery_http.go
+│   │       ├── model.go
 │   │       ├── repository.go
 │   │       └── usecase.go
 │   └── pkg
@@ -77,11 +80,6 @@ go run main.go
 │           ├── string.go
 │           └── string_test.go
 ├── main.go
-├── models
-│   ├── session.go
-│   ├── user.go
-│   └── website.go
-├── Procfile
 ├── README.md
 └── web
     ├── static

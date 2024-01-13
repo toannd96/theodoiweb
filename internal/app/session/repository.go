@@ -7,7 +7,6 @@ import (
 
 	"analytics-api/configs"
 	str "analytics-api/internal/pkg/string"
-	"analytics-api/models"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
@@ -15,16 +14,16 @@ import (
 
 // Repository ...
 type Repository interface {
-	GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error)
-	GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error)
+	GetAllSession(userID, websiteID string, listSessionID []string, session session) ([]session, error)
+	GetAllSessionID(userID, websiteID string, session session) ([]string, error)
 
-	GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error)
-	GetSession(userID, sessionID string, session *models.Session) error
+	GetSessionIDToday(userID, websiteID string, session session) ([]string, error)
+	GetSession(userID, sessionID string, session *session) error
 
 	GetCountSession(userID, sessionID string) (int64, error)
-	InsertSession(session models.Session, event models.Event) error
+	InsertSession(session session, event event) error
 
-	GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*models.Event, error)
+	GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*event, error)
 
 	GetSessionTimestamp(sessionID string) (int64, error)
 	InsertSessionTimestamp(sessionID string, timeStart int64) error
@@ -38,13 +37,13 @@ func NewRepository() Repository {
 }
 
 // GetSession get session by session id
-func (instance *repository) GetSession(userID, sessionID string, session *models.Session) error {
+func (instance *repository) GetSession(userID, sessionID string, aSession *session) error {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
 	filter := bson.M{"$and": []bson.M{
 		{"meta_data.user_id": userID},
 		{"meta_data.id": sessionID},
 	}}
-	err := sessionCollection.FindOne(context.TODO(), filter).Decode(&session)
+	err := sessionCollection.FindOne(context.TODO(), filter).Decode(&aSession)
 	if err != nil {
 		return err
 	}
@@ -52,8 +51,8 @@ func (instance *repository) GetSession(userID, sessionID string, session *models
 }
 
 // GetAllSession get all session
-func (instance *repository) GetAllSession(userID, websiteID string, listSessionID []string, session models.Session) ([]models.Session, error) {
-	var listSession []models.Session
+func (instance *repository) GetAllSession(userID, websiteID string, listSessionID []string, aSession session) ([]session, error) {
+	var listSession []session
 	opt := options.FindOne()
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
 
@@ -71,17 +70,17 @@ func (instance *repository) GetAllSession(userID, websiteID string, listSessionI
 			{"meta_data.id": sessionID},
 			{"meta_data.website_id": websiteID},
 			{"meta_data.user_id": userID},
-		}}, opt).Decode(&session)
+		}}, opt).Decode(&aSession)
 		if err != nil {
 			return nil, err
 		}
-		listSession = append(listSession, session)
+		listSession = append(listSession, aSession)
 	}
 	return listSession, nil
 }
 
 // GetAllSessionID get all id of session all time
-func (instance *repository) GetAllSessionID(userID, websiteID string, session models.Session) ([]string, error) {
+func (instance *repository) GetAllSessionID(userID, websiteID string, aSession session) ([]string, error) {
 	var listSessionID []string
 	filter := bson.M{"$and": []bson.M{
 		{"meta_data.user_id": userID},
@@ -94,18 +93,18 @@ func (instance *repository) GetAllSessionID(userID, websiteID string, session mo
 		return nil, err
 	}
 	for cursor.Next(context.TODO()) {
-		err := cursor.Decode(&session)
+		err := cursor.Decode(&aSession)
 		if err != nil {
 			return nil, err
 		}
-		listSessionID = append(listSessionID, session.MetaData.ID)
+		listSessionID = append(listSessionID, aSession.MetaData.ID)
 	}
 	listSessionID = str.RemoveDuplicateValues(listSessionID)
 	return listSessionID, nil
 }
 
 // GetAllSessionID get all id of session today
-func (instance *repository) GetSessionIDToday(userID, websiteID string, session models.Session) ([]string, error) {
+func (instance *repository) GetSessionIDToday(userID, websiteID string, aSession session) ([]string, error) {
 	var listSessionID []string
 
 	fromDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
@@ -126,35 +125,35 @@ func (instance *repository) GetSessionIDToday(userID, websiteID string, session 
 		return nil, err
 	}
 	for cursor.Next(context.TODO()) {
-		err := cursor.Decode(&session)
+		err := cursor.Decode(&aSession)
 		if err != nil {
 			return nil, err
 		}
-		listSessionID = append(listSessionID, session.MetaData.ID)
+		listSessionID = append(listSessionID, aSession.MetaData.ID)
 	}
 	listSessionID = str.RemoveDuplicateValues(listSessionID)
 	return listSessionID, nil
 }
 
 // InsertSession insert session
-func (instance *repository) InsertSession(session models.Session, event models.Event) error {
+func (instance *repository) InsertSession(aSession session, event event) error {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
-	docs := models.Session{
-		MetaData: models.MetaData{
-			ID:        session.MetaData.ID,
-			UserID:    session.MetaData.UserID,
-			WebsiteID: session.MetaData.WebsiteID,
-			Country:   session.MetaData.Country,
-			City:      session.MetaData.City,
-			Device:    session.MetaData.Device,
-			OS:        session.MetaData.OS,
-			Browser:   session.MetaData.Browser,
-			Version:   session.MetaData.Version,
-			CreatedAt: session.MetaData.CreatedAt,
+	docs := session{
+		MetaData: metaData{
+			ID:        aSession.MetaData.ID,
+			UserID:    aSession.MetaData.UserID,
+			WebsiteID: aSession.MetaData.WebsiteID,
+			Country:   aSession.MetaData.Country,
+			City:      aSession.MetaData.City,
+			Device:    aSession.MetaData.Device,
+			OS:        aSession.MetaData.OS,
+			Browser:   aSession.MetaData.Browser,
+			Version:   aSession.MetaData.Version,
+			CreatedAt: aSession.MetaData.CreatedAt,
 		},
-		Duration:   session.Duration,
+		Duration:   aSession.Duration,
 		Event:      event,
-		TimeReport: session.TimeReport,
+		TimeReport: aSession.TimeReport,
 	}
 	_, err := sessionCollection.InsertOne(context.TODO(), docs)
 	if err != nil {
@@ -177,7 +176,7 @@ func (instance *repository) GetCountSession(userID, sessionID string) (int64, er
 	return count, nil
 }
 
-func (instance *repository) GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*models.Event, error) {
+func (instance *repository) GetEventByLimitSkip(userID, sessionID string, limit, skip int) ([]*event, error) {
 	sessionCollection := configs.MongoDB.Client.Collection(configs.MongoDB.SessionCollection)
 
 	filter := bson.M{"$and": []bson.M{
@@ -192,9 +191,9 @@ func (instance *repository) GetEventByLimitSkip(userID, sessionID string, limit,
 		return nil, err
 	}
 
-	var events []*models.Event
+	var events []*event
 	for cur.Next(context.TODO()) {
-		var session models.Session
+		var session session
 		err := cur.Decode(&session)
 		if err != nil {
 			return nil, err

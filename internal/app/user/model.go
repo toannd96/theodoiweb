@@ -1,7 +1,7 @@
-package models
+package user
 
-// User ...
-type User struct {
+// user ...
+type user struct {
 	ID           string `json:"id" bson:"id"`
 	FullName     string `json:"full_name" bson:"full_name"`
 	Password     string `json:"password" bson:"password"`

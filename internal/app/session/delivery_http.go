@@ -14,7 +14,6 @@ import (
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/internal/pkg/security"
 	str "analytics-api/internal/pkg/string"
-	"analytics-api/models"
 
 	"github.com/gin-gonic/gin"
 	ua "github.com/mileusna/useragent"
@@ -30,10 +29,10 @@ type httpDelivery struct {
 
 // RequestSession website tracking send to server
 type RequestSession struct {
-	UserID    string         `json:"user_id"`
-	WebsiteID string         `json:"website_id"`
-	SessionID string         `json:"session_id"`
-	Events    []models.Event `json:"events"`
+	UserID    string  `json:"user_id"`
+	WebsiteID string  `json:"website_id"`
+	SessionID string  `json:"session_id"`
+	Events    []event `json:"events"`
 }
 
 // InitRoutes ...
@@ -83,7 +82,7 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 	}
 	logrus.Info("count event ", countSession)
 
-	msgChan := make(chan []*models.Event)
+	msgChan := make(chan []*event)
 	breakLineChan := make(chan string)
 	breakChan := make(chan bool)
 	defer func() {
@@ -140,7 +139,7 @@ func (instance *httpDelivery) GetEventBySessionID(c *gin.Context) {
 // SessionReplay replay session by session id
 func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 	sessionID := c.Param("session_id")
-	var session models.Session
+	var aSession session
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
@@ -154,14 +153,14 @@ func (instance *httpDelivery) SessionReplay(c *gin.Context) {
 		return
 	}
 
-	getSessionErr := instance.sessionUseCase.GetSession(userID, sessionID, &session)
+	getSessionErr := instance.sessionUseCase.GetSession(userID, sessionID, &aSession)
 	if getSessionErr != nil {
 		logrus.Error(c, err)
 		return
 	}
 	c.HTML(http.StatusOK, "video.html", gin.H{
 		"SessionID": sessionID,
-		"Session":   session.MetaData,
+		"Session":   aSession.MetaData,
 	})
 }
 
@@ -194,7 +193,7 @@ func (instance *httpDelivery) ListWebsiteOfSessionRecord(c *gin.Context) {
 }
 
 func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
-	var session models.Session
+	var aSession session
 	var listSessionID []string
 
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
@@ -220,19 +219,19 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 
 	switch query {
 	case "today":
-		listSessionID, err = instance.sessionUseCase.GetSessionIDToday(userID, websiteID, session)
+		listSessionID, err = instance.sessionUseCase.GetSessionIDToday(userID, websiteID, aSession)
 		if err != nil {
 			logrus.Error(c, err)
 			return
 		}
 	case "all":
-		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
+		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, aSession)
 		if err != nil {
 			logrus.Error(c, err)
 			return
 		}
 	default:
-		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, session)
+		listSessionID, err = instance.sessionUseCase.GetAllSessionID(userID, websiteID, aSession)
 		if err != nil {
 			logrus.Error(c, err)
 			return
@@ -240,7 +239,7 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 	}
 
 	if len(listSessionID) != 0 {
-		listSession, err := instance.sessionUseCase.GetAllSession(userID, websiteID, listSessionID, session)
+		listSession, err := instance.sessionUseCase.GetAllSession(userID, websiteID, listSessionID, aSession)
 		if err != nil {
 			logrus.Error(c, err)
 			return
@@ -270,7 +269,7 @@ func (instance *httpDelivery) ListSessionRecord(c *gin.Context) {
 // ReceiveSession receive session from request client
 func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 	var request RequestSession
-	var session models.Session
+	var aSession session
 
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
@@ -302,25 +301,25 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 			return
 		}
 
-		session.MetaData.UserID = request.UserID
-		session.MetaData.ID = request.SessionID
-		session.MetaData.WebsiteID = request.WebsiteID
-		session.MetaData.OS = ua.OS
-		session.MetaData.Browser = ua.Name
-		session.MetaData.Version = ua.Version
+		aSession.MetaData.UserID = request.UserID
+		aSession.MetaData.ID = request.SessionID
+		aSession.MetaData.WebsiteID = request.WebsiteID
+		aSession.MetaData.OS = ua.OS
+		aSession.MetaData.Browser = ua.Name
+		aSession.MetaData.Version = ua.Version
 
 		if ua.Mobile {
-			session.MetaData.Device = "Mobile"
+			aSession.MetaData.Device = "Mobile"
 		}
 		if ua.Tablet {
-			session.MetaData.Device = "Tablet"
+			aSession.MetaData.Device = "Tablet"
 		}
 		if ua.Desktop {
-			session.MetaData.Device = "Desktop"
+			aSession.MetaData.Device = "Desktop"
 		}
 
-		session.MetaData.Country = geoData.Country.Names["en"]
-		session.MetaData.City = str.RemoveSubstring(geoData.City.Names["en"], "City")
+		aSession.MetaData.Country = geoData.Country.Names["en"]
+		aSession.MetaData.City = str.RemoveSubstring(geoData.City.Names["en"], "City")
 
 		events := request.Events
 
@@ -335,15 +334,15 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				time2 := events[len(events)-1].Timestamp / 1000
 				duration := dur.Duration(time1, time2)
 
-				session.Duration = duration
+				aSession.Duration = duration
 
 				timeReport, err := dur.ParseTime(time.Unix(time1, 0).Format("2006-01-02, 15:04:05"))
 				if err != nil {
 					logrus.Error(c, err)
 					return
 				}
-				session.TimeReport = timeReport
-				session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
+				aSession.TimeReport = timeReport
+				aSession.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 
 				// save time1 of session id to redis
 				err = instance.sessionUseCase.InsertSessionTimestamp(request.SessionID, time1)
@@ -352,15 +351,15 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 					return
 				}
 			} else {
-				session.Duration = "00:00:00"
+				aSession.Duration = "00:00:00"
 
 				timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
 				if err != nil {
 					logrus.Error(c, err)
 					return
 				}
-				session.TimeReport = timeReport
-				session.MetaData.CreatedAt = time.Now().Format("2006-01-02, 15:04:05")
+				aSession.TimeReport = timeReport
+				aSession.MetaData.CreatedAt = time.Now().Format("2006-01-02, 15:04:05")
 			}
 		} else {
 			if len(events) != 0 {
@@ -372,25 +371,25 @@ func (instance *httpDelivery) ReceiveSession(c *gin.Context) {
 				}
 				time2 := events[len(events)-1].Timestamp / 1000
 				duration := dur.Duration(time1, time2)
-				session.Duration = duration
+				aSession.Duration = duration
 
 				timeReport, err := dur.ParseTime(time.Now().Format("2006-01-02, 15:04:05"))
 				if err != nil {
 					logrus.Error(c, err)
 					return
 				}
-				session.TimeReport = timeReport
-				session.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
+				aSession.TimeReport = timeReport
+				aSession.MetaData.CreatedAt = time.Unix(time1, 0).Format("2006-01-02, 15:04:05")
 			}
 		}
 
 		// save session
-		err = instance.sessionUseCase.InsertSession(session, events)
+		err = instance.sessionUseCase.InsertSession(aSession, events)
 		if err != nil {
 			logrus.Error(c, err)
 			return
 		}
-		c.JSON(http.StatusOK, session)
+		c.JSON(http.StatusOK, aSession)
 	} else {
 		logrus.Info("this site id not exists ", request.WebsiteID)
 		c.JSON(http.StatusConflict, gin.H{"msg": "this website not exists"})

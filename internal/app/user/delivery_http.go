@@ -4,7 +4,6 @@ import (
 	"analytics-api/internal/app/auth"
 	"analytics-api/internal/pkg/security"
 	str "analytics-api/internal/pkg/string"
-	"analytics-api/models"
 	"net/http"
 	"time"
 
@@ -101,7 +100,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 
 		createdAt := time.Now().Format("2006-01-02, 15:04:05")
 
-		user := models.User{
+		anUser := user{
 			ID:        userID,
 			FullName:  fullname,
 			Email:     email,
@@ -110,7 +109,7 @@ func (instance *httpDelivery) SignUp(c *gin.Context) {
 			UpdatedAt: createdAt,
 		}
 
-		insertErr := instance.userUseCase.InsertUser(user)
+		insertErr := instance.userUseCase.InsertUser(anUser)
 		if insertErr != nil {
 			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
@@ -125,7 +124,7 @@ func (instance *httpDelivery) ShowSigninPage(c *gin.Context) {
 }
 
 func (instance *httpDelivery) Signin(c *gin.Context) {
-	var user models.User
+	var anUser user
 	// var request RequestSignIn
 	// if err := c.ShouldBindJSON(&request); err != nil {
 	// 	c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
@@ -141,7 +140,7 @@ func (instance *httpDelivery) Signin(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	err := instance.userUseCase.GetUserByEmail(email, &user)
+	err := instance.userUseCase.GetUserByEmail(email, &anUser)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"msg": "email not exists"})
 		// c.HTML(http.StatusNotFound, "404.html", gin.H{})
@@ -149,28 +148,28 @@ func (instance *httpDelivery) Signin(c *gin.Context) {
 	}
 
 	// check password
-	isTheSame := security.DoPasswordsMatch(user.Password, password)
+	isTheSame := security.DoPasswordsMatch(anUser.Password, password)
 	if !isTheSame {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "passowrd is incorrect"})
 		return
 	}
 
 	// create token
-	token, err := security.CreateToken(user.ID)
+	token, err := security.CreateToken(anUser.ID)
 	if err != nil {
 		logrus.Error("Create token error ", err)
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
-	InsertAuthErr := instance.authUsecase.InsertAuth(user.ID, token)
+	InsertAuthErr := instance.authUsecase.InsertAuth(anUser.ID, token)
 	if InsertAuthErr != nil {
 		logrus.Error("Insert auth error ", err)
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
-	user.AccessToken = token.AccessToken
+	anUser.AccessToken = token.AccessToken
 	// user.RefreshToken = token.RefreshToken
 
 	// create cookie for client
@@ -217,7 +216,7 @@ func (instance *httpDelivery) Logout(c *gin.Context) {
 }
 
 func (instance *httpDelivery) GetUser(c *gin.Context) {
-	var user models.User
+	var anUser user
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "extract token metadata failed"})
@@ -230,14 +229,14 @@ func (instance *httpDelivery) GetUser(c *gin.Context) {
 		return
 	}
 
-	getUserErr := instance.userUseCase.GetUserByID(userID, &user)
+	getUserErr := instance.userUseCase.GetUserByID(userID, &anUser)
 	if getUserErr != nil {
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
 	c.HTML(http.StatusOK, "profile.html", gin.H{
-		"User": user,
+		"User": anUser,
 	})
 }
 
@@ -268,11 +267,11 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	if fullName == "" {
 		if password == confirmPassword {
-			user := models.User{
+			anUser := user{
 				Password:  hash,
 				UpdatedAt: updatedAt,
 			}
-			err := instance.userUseCase.UpdatePassword(userID, &user)
+			err := instance.userUseCase.UpdatePassword(userID, &anUser)
 			if err != nil {
 				c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 				return
@@ -283,11 +282,11 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 	}
 
 	if password == "" {
-		user := models.User{
+		anUser := user{
 			FullName:  fullName,
 			UpdatedAt: updatedAt,
 		}
-		err := instance.userUseCase.UpdateFullName(userID, &user)
+		err := instance.userUseCase.UpdateFullName(userID, &anUser)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
@@ -296,12 +295,12 @@ func (instance *httpDelivery) UpdateUser(c *gin.Context) {
 
 	if fullName != "" && password != "" {
 		if password == confirmPassword {
-			user := models.User{
+			anUser := user{
 				FullName:  fullName,
 				Password:  hash,
 				UpdatedAt: updatedAt,
 			}
-			updateUserErr := instance.userUseCase.UpdateUser(userID, &user)
+			updateUserErr := instance.userUseCase.UpdateUser(userID, &anUser)
 			if updateUserErr != nil {
 				c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 				return

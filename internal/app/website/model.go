@@ -1,7 +1,7 @@
-package models
+package website
 
-// Website ...
-type Website struct {
+// website ...
+type website struct {
 	ID        string `json:"id" bson:"id"`
 	UserID    string `json:"user_id" bson:"user_id"`
 	Category  string `json:"category" bson:"category"`
@@ -11,5 +11,5 @@ type Website struct {
 	UpdatedAt string `json:"updated_at" bson:"updated_at"`
 }
 
-// Websites ...
-type Websites []Website
+// websites ...
+type websites []website

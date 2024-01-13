@@ -6,7 +6,6 @@ import (
 	"analytics-api/internal/pkg/middleware"
 	"analytics-api/internal/pkg/security"
 	str "analytics-api/internal/pkg/string"
-	"analytics-api/models"
 	"net/http"
 	"time"
 
@@ -74,7 +73,7 @@ func (instance *httpDelivery) Tracking(c *gin.Context) {
 
 func (instance *httpDelivery) GetWebsite(c *gin.Context) {
 	websiteID := c.Param("website_id")
-	var website models.Website
+	var aWebsite website
 	tokenAuth, err := security.ExtractAccessTokenMetadata(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "extract token metadata failed"})
@@ -87,13 +86,13 @@ func (instance *httpDelivery) GetWebsite(c *gin.Context) {
 		return
 	}
 
-	getWebsiteErr := instance.websiteUseCase.GetWebsite(userID, websiteID, &website)
+	getWebsiteErr := instance.websiteUseCase.GetWebsite(userID, websiteID, &aWebsite)
 	if getWebsiteErr != nil {
 		c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 		return
 	}
 
-	c.JSON(http.StatusOK, website)
+	c.JSON(http.StatusOK, aWebsite)
 }
 
 func (instance *httpDelivery) GetAllWebsite(c *gin.Context) {
@@ -165,7 +164,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 
 		createdAt := time.Now().Format("2006-01-02, 15:04:05")
 
-		website := models.Website{
+		aWebsite := website{
 			ID:        websiteID,
 			UserID:    userID,
 			Category:  category,
@@ -175,7 +174,7 @@ func (instance *httpDelivery) AddWebsite(c *gin.Context) {
 			UpdatedAt: createdAt,
 		}
 
-		insertErr := instance.websiteUseCase.InsertWebsite(userID, website)
+		insertErr := instance.websiteUseCase.InsertWebsite(userID, aWebsite)
 		if insertErr != nil {
 			c.HTML(http.StatusInternalServerError, "500.html", gin.H{})
 			return
