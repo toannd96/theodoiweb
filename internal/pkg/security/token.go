@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/twinj/uuid"
+	"github.com/google/uuid"
 )
 
 type TokenDetails struct {
@@ -21,7 +21,7 @@ type TokenDetails struct {
 func CreateToken(userID string) (*TokenDetails, error) {
 	td := &TokenDetails{
 		AtExpires:  time.Now().Add(time.Hour * 24).Unix(),
-		AccessUUID: uuid.NewV4().String(),
+		AccessUUID: uuid.New().String(),
 		// RtExpires:   time.Now().Add(time.Hour * 24).Unix(),
 		// RefreshUUID: uuid.NewV4().String(),
 	}
